@@ -8,7 +8,7 @@ function init() {
   let selectedLayer;
   let selectedFeature;
 
-  map.setView([40, -95], 5);
+  map.setView([40, -95], 4);
 
   const worldLayer = L.tileLayer(
     'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
@@ -111,8 +111,9 @@ function init() {
 
   // define functions that right icon for a given feature
   function getIcon(folder, name) {
+    let lname = name.toLowerCase();
     var icon = L.icon({
-      iconUrl: folder + '/' + name + '.webp',
+      iconUrl: folder + '/' + lname + '.webp',
       iconSize: [35, 35],
     });
 
