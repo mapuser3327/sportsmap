@@ -24,16 +24,17 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
     <link rel="stylesheet" href="main.css"/>
 
-		<script src="main.js"></script>
-    <script src="eagles.js"></script>
+		 <script src="main.js"></script>
+     <script src="eagles.js"></script>
      <script src="arenas.js"></script>
      <script src="nflstadiums.js"></script>
+     <script src="eagles_players.js"></script>
     </head>
     
     <style>
       body {
-          padding-top: 80px;
-          padding-bottom: 40px;
+          padding-top: 60px;
+         
       }
     </style>
     <body  onload="init()" >
@@ -58,8 +59,34 @@
   </div>
 </nav>
 
-      <div id="mapid">  
-      </div>  
+<div id="mapid">
+</div>     
+ 
+      <div class="panel-side">
+        <div class = "panel-header">          
+        Eagles Roster
+        <div class = "panel-selects">
+        <select>
+          <option>Pick Mapped Event</option>
+          <option value="birth">Birth Place</option>
+          <option value="college">College</option>
+          <option value="first team">First Team</option>
+        </select>
+      </div>
+      <div class = "panel-selects">
+       <select>
+          <option>Pick Team</option>
+          <option value="offense">Offense</option>
+          <option value="defense">Defense</option>
+          <option value="special">Special Teams</option>
+        </select>
+      </div>
+      </div>
+      <ul id="list_players">        
+      </ul>  
+     </div> 
+   
+  </div>
 
 </body>
 </html>
