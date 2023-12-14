@@ -15,20 +15,26 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
  
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
- 
-
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.2.0/leaflet.js" crossorigin=""></script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    
     <link rel="stylesheet" href="main.css"/>
 
-		 <script src="main.js"></script>
+		 
      <script src="eagles.js"></script>
      <script src="arenas.js"></script>
      <script src="nflstadiums.js"></script>
      <script src="eagles_players.js"></script>
+     <script src="nba.js"></script>
+     <script src="nfl.js"></script>
+     <script src="mlb.js"></script>
+     <script src="nhl.js"></script>
+     <script src="mls.js"></script>
+     <script src="main.js"></script>
+
     </head>
     
     <style>
@@ -46,14 +52,8 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarCollapse">
-      <ul class="navbar-nav me-auto mb-2 mb-md-0">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" "><img id="stadiums" width="40px" height="40px" src="NFL.svg"></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" ><img id="arenas" width="40px" height="40px" src="NBA.svg"></a>
-        </li>
-        
+      <ul id="sportsmenu" class="navbar-nav me-auto mb-2 mb-md-0">
+    
       </ul>     
     </div>
   </div>
