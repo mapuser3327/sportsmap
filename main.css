@@ -65,4 +65,13 @@ body,
 .panel-result:focus {
   color: orange;
   background-color: rgba(0, 0, 0, 0.75);
-}    
+} 
+
+
+.leaflet-control-search .search-button {
+		
+	width:30px;
+	height:30px;	
+	background: url('search-icon.png') bottom/75% no-repeat #fff;
+
+}

@@ -1,18 +1,51 @@
-var map;
-var sportsLayerMap = new Map();
+const sportsLayerMap = new Map();
+const teamLogos = [
+  "https://static.www.nfl.com/image/upload/v1554321393/league/nvfr7ogywskqrfaiu38m.svg",
+  "https://cdn.nba.com/logos/leagues/logo-nba.svg",
+  "https://www.mlbstatic.com/team-logos/league-on-dark/1.svg",
+  "https://media.d3.nhle.com/image/private/t_q-best/prd/assets/nhl/logos/nhl_shield_wm_on_dark_fqkbph",
+  "https://images.mlssoccer.com/image/upload/v1665849438/assets/logos/MLS-Crest-FFF-480px_tmwlkh.png",
+];
 
+var map;
+var searchControl;
 function changeLayer(sport) {
   $("a.nav-link.active").removeClass("active");
-  {
-    /* <li id="nav-item-nba" class="nav-item">
-  <a id="nav-link-nba */
-  }
-
   $(`#nav-link-${sport}`).addClass("active");
-
+  let index = -1;
   sportsLayerMap.forEach((lyr, k) => {
+    index++;
     if (k.toLowerCase().indexOf(sport) > -1) {
       map.addLayer(lyr);
+      console.log($("#panel-side"));
+      searchControl?.remove(map);
+      searchControl = L.control
+        .search({
+          layer: lyr,
+          container: $("#panel-side")[0],
+          initial: false,
+          propertyName: "team",
+          //zoom: 7,
+          marker: {
+            icon: null,
+            circle: {
+              radius: 20,
+              color: "#0a0",
+              opacity: 1,
+            },
+          },
+        })
+        .addTo(map);
+      $(".leaflet-control-search .search-button").css(
+        "background",
+        `url('${teamLogos[index]}') center/90% no-repeat ${
+          sport === "mls" ? "#000" : "#fff"
+        }`
+      );
+
+      console.log(
+        $(".leaflet-control-search .search-button").css("background")
+      );
     } else map.removeLayer(lyr);
   });
 }
@@ -81,8 +114,6 @@ function init() {
   };
   map.addLayer(osmHumanitarian);
   // add the metro GeoJSON layer
-  let stadiumLayer;
-  let arenaLayer;
 
   teamMaps = [];
   nbaTeamData = new Map();
@@ -135,6 +166,7 @@ function init() {
   });
   teamMaps[4] = mlsTeamData;
 
+  let searchLayer;
   overlayMaps = new Map();
   $.getJSON("./venues.geojson", function (data) {
     sports.forEach((sport, index) => {
@@ -286,13 +318,6 @@ function init() {
 function displayMenu(sports) {
   const listNode = document.getElementById("sportsmenu");
   const fragment = document.createDocumentFragment();
-  const urls = [
-    "https://static.www.nfl.com/image/upload/v1554321393/league/nvfr7ogywskqrfaiu38m.svg",
-    "https://cdn.nba.com/logos/leagues/logo-nba.svg",
-    "https://www.mlbstatic.com/team-logos/league-on-dark/1.svg",
-    "https://media.d3.nhle.com/image/private/t_q-best/prd/assets/nhl/logos/nhl_shield_wm_on_dark_fqkbph",
-    "https://images.mlssoccer.com/image/upload/v1665849438/assets/logos/MLS-Crest-FFF-480px_tmwlkh.png",
-  ];
 
   sports.forEach((sport, index) => {
     const li = document.createElement("li");
@@ -304,7 +329,7 @@ function displayMenu(sports) {
     a.classList.add("active");
     //a.classList.add("active");
     a.href = `javascript:changeLayer("${sport}")`;
-    a.innerHTML = `<img id="${sport}" width="40px" height="40px" src="${urls[index]}">`;
+    a.innerHTML = `<img id="${sport}" width="40px" height="40px" src="${teamLogos[index]}">`;
     li.appendChild(a);
     fragment.appendChild(li);
   });
