@@ -1,4 +1,6 @@
 const sportsLayerMap = new Map();
+const teamMap = new Map();
+const sports = ["nfl", "nba", "mlb", "nhl", "mls"];
 const teamLogos = [
   "https://static.www.nfl.com/image/upload/v1554321393/league/nvfr7ogywskqrfaiu38m.svg",
   "https://cdn.nba.com/logos/leagues/logo-nba.svg",
@@ -9,6 +11,7 @@ const teamLogos = [
 
 var map;
 var searchControl;
+
 function changeLayer(sport) {
   $("a.nav-link.active").removeClass("active");
   $(`#nav-link-${sport}`).addClass("active");
@@ -25,6 +28,7 @@ function changeLayer(sport) {
           container: $("#panel-side")[0],
           initial: false,
           propertyName: "team",
+          hideMarkerOnCollapse: true,
           //zoom: 7,
           marker: {
             icon: null,
@@ -51,7 +55,7 @@ function changeLayer(sport) {
 }
 
 function init() {
-  const sports = ["nfl", "nba", "mlb", "nhl", "mls"];
+  loadNFLRosters();
   displayMenu(sports);
 
   // create map and set center and zoom level
@@ -139,7 +143,7 @@ function init() {
       data.homeTeam.teamId
     );
   });
-  console.log(nbaTeamData);
+
   teamMaps[1] = nbaTeamData;
 
   mlbData.records.forEach((data) => {
@@ -165,7 +169,7 @@ function init() {
     );
   });
   teamMaps[4] = mlsTeamData;
-
+  console.log(teamMaps);
   let searchLayer;
   overlayMaps = new Map();
   $.getJSON("./venues.geojson", function (data) {
@@ -338,32 +342,94 @@ function displayMenu(sports) {
 }
 
 function showRoster(sport, teamName) {
-  displayResults(eagles);
+  console.log(sport);
+
+  const index = sports.indexOf(sport);
+  console.log(index);
+  const sportsMap = teamMaps[index];
+
+  console.log(sportsMap);
+  const teamAbbrev = sportsMap.get(teamName);
+  console.log(teamAbbrev);
+  const roster = teamMap.get(teamAbbrev);
+  console.log(roster);
+  displayResults(teamName, roster);
 }
 
-function displayResults(results) {
+function displayResults(teamName, results) {
   const listNode = document.getElementById("list_players");
+  document.getElementById("team_name").innerHTML =
+    teamName.charAt(0).toUpperCase() + teamName.substring(1) + " Roster";
   const fragment = document.createDocumentFragment();
-  results.features.forEach(function (player, index) {
+  for (const [key, player] of results.entries()) {
     // county.popupTemplate = popupInfo;
+    // console.log(key, player);
+    const lname = player.get("last_name") + " " + player.get("first_name");
+    //console.log(lname);
+    //const img = `<img src="./eaglesProfilePics/${lname}.webp" width="50" height="35">`;
+    // console.log(player.get("headshot_url"));
 
-    const attributes = player.properties;
+    let imgUrl =
+      player.get("headshot_url").replace('"', "") +
+      "," +
+      player.get("ngs_position").replace('"', "");
 
-    const nameparts = attributes.player.toLowerCase().split(" ");
-    const lname = nameparts[1] + "_" + nameparts[0];
-    const img = `<img src="./eaglesProfilePics/${lname}.webp" width="50" height="35">`;
-    const name = img + "  " + attributes.player_no + ": " + attributes.player;
-
+    let img = `<img src = "${imgUrl}" width="50" height="50">`;
+    //console.log(img);
+    const name =
+      img + " " + player.get("jersey_number") + ": " + player.get("full_name");
     const li = document.createElement("li");
     li.classList.add("panel-result");
     li.tabIndex = 0;
-    li.setAttribute("data-result-id", index);
-    li.setAttribute("unit", attributes.unit);
-    li.setAttribute("position", attributes.position);
+    // li.setAttribute("data-result-id", index);
+    // li.setAttribute("unit", attributes.unit);
+    // li.setAttribute("position", attributes.position);
     li.innerHTML = name;
     fragment.appendChild(li);
-  });
+  }
 
   listNode.innerHTML = "";
   listNode.appendChild(fragment);
 }
+
+const loadNFLRosters = () => {
+  console.log("Loading NFL Roster");
+  fetch("roster_2023.csv")
+    .then(function (response) {
+      return response.text();
+    })
+    .then(function (text) {
+      const lines = text.split("\n");
+      const headers = lines[0].split(",");
+      let playerIndex = headers.indexOf("jersey_number");
+      let teamIndex = headers.indexOf("team");
+
+      for (var i = 1; i < lines.length; i++) {
+        const line = lines[i];
+        const values = line.split(",");
+        const team = values[teamIndex];
+        let teamData = teamMap.get(team);
+        if (!teamData) {
+          teamData = new Map();
+        }
+        const playerNo = values[playerIndex];
+        const player = loadPlayerData(headers, values);
+        teamData.set(playerNo, player);
+        teamMap.set(team, teamData);
+      }
+      console.log(teamMap);
+    })
+    .catch(function (err) {
+      // Error handling goes here (e.g. the network request failed, etc)
+      console.log(err);
+    });
+};
+
+const loadPlayerData = (headers, values) => {
+  const playerMap = new Map();
+  let i = 0;
+  headers.forEach((key) => {
+    playerMap.set(key, values[i++]);
+  });
+  return playerMap;
+};
