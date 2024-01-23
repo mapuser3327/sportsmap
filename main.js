@@ -56,6 +56,7 @@ function changeLayer(sport) {
 
 function init() {
   loadNFLRosters();
+  loadNBARosters();
   displayMenu(sports);
 
   // create map and set center and zoom level
@@ -342,17 +343,9 @@ function displayMenu(sports) {
 }
 
 function showRoster(sport, teamName) {
-  console.log(sport);
-
   const index = sports.indexOf(sport);
-  console.log(index);
   const sportsMap = teamMaps[index];
-
-  console.log(sportsMap);
-  const teamAbbrev = sportsMap.get(teamName);
-  console.log(teamAbbrev);
-  const roster = teamMap.get(teamAbbrev);
-  console.log(roster);
+  const roster = teamMap.get(sportsMap.get(teamName));
   displayResults(teamName, roster);
 }
 
@@ -406,8 +399,8 @@ const loadNFLRosters = () => {
 
       for (var i = 1; i < lines.length; i++) {
         const line = lines[i];
-        const values = line.split(",");
-        const team = values[teamIndex];
+        const values = line.split(","); // Buggy, should ignore commas in ""
+        const team = values[teamIndex]; // 3 digit code for NFL team
         let teamData = teamMap.get(team);
         if (!teamData) {
           teamData = new Map();
@@ -432,4 +425,19 @@ const loadPlayerData = (headers, values) => {
     playerMap.set(key, values[i++]);
   });
   return playerMap;
+};
+
+const loadNBARosters = () => {
+  console.log("Loading NBA Roster");
+
+  fetch("nbaRoster.json")
+    .then((response) => response.json())
+    .then((data) => {
+      // Access and use the JSON data here
+      console.log(data);
+    })
+    .catch((error) => {
+      // Handle errors
+      console.error(error);
+    });
 };
