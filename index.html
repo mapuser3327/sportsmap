@@ -20,21 +20,20 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/leaflet.label/0.2.4/leaflet.label.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-search/4.0.0/leaflet-search.min.js"></script>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-search/4.0.0/leaflet-search.min.css" />
-    <link rel="stylesheet" href="main.css"/>
-
+    <link rel="stylesheet" href="css/main.css"/>
+ 
 		 
-     <script src="eagles.js"></script>
-     <script src="eagles_players.js"></script>
-     <script src="nba.js"></script>
-     <script src="nfl.js"></script>
-     <script src="mlb.js"></script>
-     <script src="nhl.js"></script>
-     <script src="mls.js"></script>
-     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-search/4.0.0/leaflet-search.min.js"></script>
-     <script src="main.js"></script>
+     <script src="data/nba.js"></script>
+     <script src="data/nfl.js"></script>
+     <script src="data/mlb.js"></script>
+     <script src="data/nhl.js"></script>
+     <script src="data/mls.js"></script>   
+     <script src="src/initData.js"></script>
+     <script src="src/main.js"></script>
 
     </head>
     
@@ -74,24 +73,25 @@
           <option value="rookie">First Team</option>
         </select>
       </div>
-      <div class = "panel-selects">
-       <select>
-          <option>Pick Team</option>
-          <option value="offense">Offense</option>
-          <option value="defense">Defense</option>
-          <option value="special">Special Teams</option>
-        </select>
+      <div class = "panel-selects" >
+        Filter By: <select id="filter-types" onChange="showDropDown(value)">
+         
+        </select>        
+       
       </div>
+      <div id="filter-types">
+      </div>
+      <div id="show-filters">
       </div>
       <ul id="list_players">        
       </ul>  
      </div> 
 
-     <div id="popup_id" class="popup">
-      <p id="popup_contents">This is the popup content.</p>
-      <button onclick="$('.popup').hide()"">Close</button>
-    </div>
-  </div>
 
+  </div>
+  <div id="popup_id" class="popup">
+    <p id="popup_contents">This is the popup content.</p>
+    <button onclick="$('.popup').hide()"">Close</button>
+  </div>
 </body>
 </html>

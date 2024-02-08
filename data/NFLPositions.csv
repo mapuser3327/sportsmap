@@ -1,0 +1,34 @@
+position,position_code,unit
+Quarterback,QB,O
+Running Back,RB,O
+Full Back,FB,O
+Wide Receiver,WR,O
+Tight End,TE,O
+Center,C,O
+Left Guard,LG,O
+Right Guard,RG,O
+Left Tackle,LT,O
+Right Tackle,RT,O
+Nose Tackle,NT,D
+Defensive Tackle,DT,D
+Defensive End,DE,D
+Cornerback,CB,D
+Linebacker,LB,D
+Middle Linebacker,MLB,D
+Outside Linebacker,OLB,D
+Free Safety,FS,D
+Strong Safety,SS,D
+Tackle,T,D
+Guard,G,O
+Kicker,K,ST
+Punter,P,ST
+Halfback,HB,O
+Tailback,TB,O
+Safety,S,D
+Holder,H,ST
+Long Snapper,LS,ST
+Kickoff Returner,KR,ST
+Punt Returner,PR,ST
+Offensive Lineman,OL,O
+Defensive Back,DB,D
+Defensive Lineman,DL,D
