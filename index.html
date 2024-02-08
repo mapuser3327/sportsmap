@@ -19,6 +19,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.2.0/leaflet.js" crossorigin=""></script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/leaflet.label/0.2.4/leaflet.label.js"></script>
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-search/4.0.0/leaflet-search.min.css" />
     <link rel="stylesheet" href="main.css"/>
@@ -60,16 +62,16 @@
 
 <div id="mapid">
 </div>     
- 
+
       <div class="panel-side">
         <div class = "panel-header">          
         <span id="team_name">Eagles Roster</span>
         <div class = "panel-selects">
-        <select>
+        <select id="mappedEvent">
           <option>Pick Mapped Event</option>
           <option value="birth">Birth Place</option>
           <option value="college">College</option>
-          <option value="first team">First Team</option>
+          <option value="rookie">First Team</option>
         </select>
       </div>
       <div class = "panel-selects">
@@ -84,7 +86,11 @@
       <ul id="list_players">        
       </ul>  
      </div> 
-   
+
+     <div id="popup_id" class="popup">
+      <p id="popup_contents">This is the popup content.</p>
+      <button onclick="$('.popup').hide()"">Close</button>
+    </div>
   </div>
 
 </body>

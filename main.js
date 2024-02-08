@@ -1,6 +1,7 @@
 const sportsLayerMap = new Map();
 const teamMap = new Map();
 const sports = ["nfl", "nba", "mlb", "nhl", "mls"];
+const allTeamLocations = new Map();
 const teamLogos = [
   "https://static.www.nfl.com/image/upload/v1554321393/league/nvfr7ogywskqrfaiu38m.svg",
   "https://cdn.nba.com/logos/leagues/logo-nba.svg",
@@ -11,8 +12,13 @@ const teamLogos = [
 
 var map;
 var searchControl;
+var currentMarkerGroup;
 
 function changeLayer(sport) {
+  $("#mappedEvent").val("");
+  if (currentMarkerGroup) {
+    currentMarkerGroup.clearLayers();
+  }
   $("a.nav-link.active").removeClass("active");
   $(`#nav-link-${sport}`).addClass("active");
   let index = -1;
@@ -173,6 +179,7 @@ function init() {
   console.log(teamMaps);
   let searchLayer;
   overlayMaps = new Map();
+
   $.getJSON("./venues.geojson", function (data) {
     sports.forEach((sport, index) => {
       venueLayer = L.geoJson(data, {
@@ -190,7 +197,7 @@ function init() {
           const marker = L.marker(latlng, {
             icon: getIconUrl(sport, index, teamName),
           });
-          //?.on("click", showRoster("eagles"));
+
           marker.addEventListener("click", () => showRoster(sport, teamName));
           return marker;
         },
@@ -204,13 +211,35 @@ function init() {
         sportsLayerMap.set(sport.toUpperCase() + " Venues", venueLayer);
         overlayMaps.set(`${sport.toUpperCase()} Venues`, venueLayer);
       }
+
+      let teamLocations = new Map();
+
+      venueLayer.eachLayer(function (layer) {
+        // console.log(layer);
+        // console.log(layer.feature.properties.team);
+        // console.log(layer.getLatLng());
+
+        const parts = layer.feature.properties.team.toLowerCase().split(" ");
+        let teamName = parts[parts.length - 1];
+
+        if (sport === "mls") {
+          teamName = layer.feature.properties.team
+            .toLowerCase()
+            .replace(/ /g, "-");
+        }
+        let teamId = (teamid = teamMaps[index]?.get(teamName));
+
+        teamLocations.set(teamId, layer.getLatLng());
+      });
+
+      allTeamLocations.set(sport, teamLocations);
     });
   });
 
   // const playerLayer = L.geoJSON(eaglesPlayers, {
   //   onEachFeature: function (feature, layer) {
   //     // console.log(feature.properties);
-  //     const html = `<li>${feature.properties.Name} ${feature.properties.EventType}<li>Year: ${feature.properties.EventYear}<li>Position: ${feature.properties.Position}<li>Team: ${feature.properties.Team}<li><a href="https://www.google.com/search?q=nfl+${feature.properties.Team}">Team Data</a>`;
+  //     const html = `<li>${feature.properties.Name} ${feature.properties.EventType}<li>Year: ${feature.properties.EventYear}<li>Position: ${feature.properties.Position}<li>Team: ${feature.properties.Team}<li><a target="_blank" rel="noopener noreferrer" href="https://www.google.com/search?q=nfl+${feature.properties.Team}">Team Data</a>`;
   //     layer.bindPopup(html);
   //   },
   //   pointToLayer: function (feature, latlng) {
@@ -239,7 +268,7 @@ function init() {
     return icon;
   }
   // define functions that right icon for a given feature
-  function getIconUrl(sport, index, name) {
+  const getIconUrl = (sport, index, name) => {
     let lname = name.toLowerCase();
     teamid = teamMaps[index]?.get(lname);
 
@@ -257,7 +286,7 @@ function init() {
     });
 
     return icon;
-  }
+  };
   // define function to handle click events on metro features
   function playersOnEachFeature(feature, layer) {
     layer.on({
@@ -287,7 +316,10 @@ function init() {
         var titleHtml =
           '<p style="font-size:18px"><b>' + featureName + "</b></p>";
         var descripHtml = "<p>The " + featureName + ", " + team + " </p>";
-        var readmoreHtml = '<p><a href="' + link + '">Read more</a></p>';
+        var readmoreHtml =
+          '<p><a target="_blank" rel="noopener noreferrer" href="' +
+          link +
+          '">Read more</a></p>';
         document.getElementById("summaryLabel").innerHTML =
           titleHtml + descripHtml + readmoreHtml;
         document.getElementById("metroImage").innerHTML = photoHtml;
@@ -342,12 +374,67 @@ function displayMenu(sports) {
   listNode.appendChild(fragment);
 }
 
-function showRoster(sport, teamName) {
+const showRoster = (sport, teamName) => {
   const index = sports.indexOf(sport);
   const sportsMap = teamMaps[index];
   const roster = teamMap.get(sportsMap.get(teamName));
   displayResults(teamName, roster);
-}
+  $(".panel-side").show();
+  // $().addEventListener("click", () => showRoster(sport, teamName));
+  $("#mappedEvent").on("change", function () {
+    // Get the newly selected value
+    let teamLocations = allTeamLocations.get(sport);
+
+    const selectedValue = $(this).val();
+    changeLayer("none");
+    currentMarkerGroup = L.layerGroup().addTo(map);
+    for (const [key, player] of roster.entries()) {
+      if (player.get("draft_number")) {
+        let latlng = teamLocations.get(player.get("draft_number"));
+        let imgUrl =
+          player.get("headshot_url")?.replace('"', "") +
+          "," +
+          player.get("ngs_position")?.replace('"', "");
+
+        if (latlng) {
+          let specialIcon = L.Icon.extend({
+            options: {
+              iconUrl: imgUrl,
+              iconSize: [40, 40],
+            },
+          });
+
+          const marker = L.marker(latlng, {
+            icon: new specialIcon(),
+          });
+
+          marker.addTo(currentMarkerGroup);
+
+          let rookieTeam = teamName;
+          sportsMap.forEach((key, value) => {
+            if (key === player.get("draft_number")) {
+              rookieTeam = value;
+            }
+          });
+
+          let text = `<h4> ${player.get("full_name")} </h4>\
+          <li>Drafted By: ${rookieTeam} \
+          
+          <li>Rookie Year: ${player.get("rookie_year")} \
+          <li>College: ${player.get("college")} \
+          <br>
+          <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/${player
+            .get("full_name")
+            .replace(" ", "_")}">Wikipedia</a>
+          `;
+          let label = `${player.get("full_name")} ${player.get("rookie_year")}`;
+          marker.bindPopup(text); // Add a popup with the name of the point
+          // marker.bindLabel(label, { noHide: true });
+        }
+      }
+    }
+  });
+};
 
 function displayResults(teamName, results) {
   const listNode = document.getElementById("list_players");
@@ -363,9 +450,9 @@ function displayResults(teamName, results) {
     // console.log(player.get("headshot_url"));
 
     let imgUrl =
-      player.get("headshot_url").replace('"', "") +
+      player.get("headshot_url")?.replace('"', "") +
       "," +
-      player.get("ngs_position").replace('"', "");
+      player.get("ngs_position")?.replace('"', "");
 
     let img = `<img src = "${imgUrl}" width="50" height="50">`;
     //console.log(img);
@@ -373,11 +460,40 @@ function displayResults(teamName, results) {
       img + " " + player.get("jersey_number") + ": " + player.get("full_name");
     const li = document.createElement("li");
     li.classList.add("panel-result");
+    li.classList.add("hover-trigger");
     li.tabIndex = 0;
     // li.setAttribute("data-result-id", index);
     // li.setAttribute("unit", attributes.unit);
     // li.setAttribute("position", attributes.position);
     li.innerHTML = name;
+    li.popupContent = `<h4>${player.get("jersey_number")} ${player.get(
+      "full_name"
+    )}</h4> \
+    <table style="border:0px"><tr><td>
+    <li>Position: ${player.get("position")} \
+    <li>Status: ${player.get("status")} \
+    <li>Height: ${player.get("height")}  Weight: ${player.get("weight")} \
+    <li>Rookie Year: ${player.get("rookie_year")}  Drafted By: ${player.get(
+      "draft_number"
+    )}
+    <li>College: ${player.get("college")}
+    <li>Birth Date: ${player.get("birth_date")}
+    <br>
+    <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/${player
+      .get("full_name")
+      .replace(" ", "_")}">Wikipedia</a>
+    &nbsp;&nbsp;&nbsp;<a target="_blank" rel="noopener noreferrer" href="https://www.nfl.com/players/${player
+      .get("full_name")
+      .replace(" ", "-")
+      .toLowerCase()}">NFL Stats</a>
+      </td>
+      <td>
+      <img src = "${imgUrl}" width="200" height="180">
+      </td>
+      </tr>
+      </table>
+    `;
+    setupHovers(li);
     fragment.appendChild(li);
   }
 
@@ -440,4 +556,21 @@ const loadNBARosters = () => {
       // Handle errors
       console.error(error);
     });
+};
+
+const setupHovers = (element) => {
+  element.addEventListener("click", function (e) {
+    var trigger = $(this);
+
+    let triggerPosition = trigger.offset();
+    var popupHeight = $(".popup").outerHeight();
+
+    // Set the position of the popup
+    $(".popup").css({
+      top: triggerPosition.top + trigger.outerHeight(),
+      left: triggerPosition.left - 200,
+    });
+    $(".popup #popup_contents").html(element.popupContent);
+    $(".popup").show();
+  });
 };
