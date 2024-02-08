@@ -6,7 +6,7 @@ const allTeamLocations = new Map();
 const nflPositions = new Map();
 const nflFilterableFields = [
   "season",
-  "team",
+  "subteam",
   "position",
   "status",
   "last_name",
@@ -116,7 +116,6 @@ const loadNFLRosters = () => {
         const line = lines[i];
         const values = line.split(","); // Buggy, should ignore commas in ""
 
-        setUpFilters("nfl", headers, line);
         const status = values[statusIndex];
 
         const team = values[teamIndex]; // 3 digit code for NFL team
@@ -126,7 +125,9 @@ const loadNFLRosters = () => {
         }
         const playerNo = values[playerIndex];
         const player = loadPlayerData(headers, values);
+
         if (status === "RES") continue;
+        setUpFilters("nfl", player);
         teamData.set(playerNo, player);
         teamMap.set(team, teamData);
       }
@@ -168,6 +169,7 @@ const showRoster = (sport, teamName) => {
 
   displayResults(teamName, roster);
   $(".panel-side").show();
+
   // $().addEventListener("click", () => showRoster(sport, teamName));
   $("#mappedEvent").on("change", function () {
     // Get the newly selected value
@@ -223,6 +225,8 @@ const showRoster = (sport, teamName) => {
       }
     }
   });
+
+  showHidePlayers($("#filter-types").val(), $(".sports-filter:visible").val());
 };
 const buildPopupContent = (player) => {
   const wikiPlayerName = player.get("full_name").replace(" ", "_");
@@ -312,6 +316,7 @@ function displayResults(teamName, results) {
     const li = document.createElement("li");
     li.classList.add("panel-result");
     li.classList.add("hover-trigger");
+    setFields(li, player);
     li.innerHTML = name;
     li.popupContent = buildPopupContent(player);
     setupHovers(li);
@@ -322,24 +327,25 @@ function displayResults(teamName, results) {
   listNode.appendChild(fragment);
 }
 
-const setUpFilters = (sport, headers, line) => {
-  const values = line.split(","); // Buggy, should ignore commas in ""
+const setUpFilters = (sport, player) => {
+  nflFilterableFields.forEach((field) => {
+    let set = nflFilters.get(field);
 
-  values.forEach((value, j) => {
-    let header = headers[j];
-    if (nflFilterableFields.indexOf(header) > -1) {
-      let set = nflFilters.get(header);
-
-      if (!set) {
-        set = new Set();
-        nflFilters.set(header, set);
-      }
-      set.add(value.trim());
+    if (!set) {
+      set = new Set();
+      nflFilters.set(field, set);
     }
-  });
-  // for (const j = 0; j < values.length; j++) {
 
-  // }
+    let value = player.get(field);
+    if (value && value.trim() !== "") set.add(value);
+  });
+};
+
+const setFields = (li, player) => {
+  nflFilterableFields.forEach((field) => {
+    let value = player.get(field);
+    li.setAttribute(field, value);
+  });
 };
 
 const loadPlayerData = (headers, values) => {
@@ -406,12 +412,17 @@ const populateFilters = (sports) => {
   filters.appendChild(fragment);
 };
 
+const filterBy = (val) => {
+  console.log(val);
+};
+
 const addFilterableList = (key) => {
   values = nflFilters.get(key);
   const fragment = document.createDocumentFragment();
   const select = document.createElement("select");
   select.classList.add("sports-filter");
   select.id = "filter-" + key;
+
   const li = document.createElement("option");
   li.value = "";
   li.innerHTML = "Select a " + key;

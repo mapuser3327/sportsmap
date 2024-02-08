@@ -283,7 +283,25 @@ function init() {
   });
 }
 
+const showHidePlayers = (key, value) => {
+  //let matches = $("#list_players li[" + key + "]");
+  $("#list_players li")
+    .filter(function () {
+      return $(this).attr(key) !== value;
+    })
+    .hide();
+  $("#list_players li")
+    .filter(function () {
+      return $(this).attr(key) === value;
+    })
+    .show();
+};
+
 const showDropDown = (value) => {
-  console.log("filter-" + value + "*");
-  $(".filter-" + value).show();
+  $(".sports-filter").hide();
+  $("#filter-" + value).show();
+  $("#filter-" + value).on("change", function () {
+    const selectedValue = $(this).val();
+    showHidePlayers(value, selectedValue);
+  });
 };
