@@ -12,9 +12,14 @@ const nflFilterableFields = [
   "last_name",
   "college",
 ];
+const nbaFilterableFields = ["SEASON", "POSITION", "LAST_NAME", "SCHOOL"];
 const nflFilters = new Map();
+const nbaFilters = new Map();
 
 const initSportsData = () => {
+  // For NBA, data was built by making these calls: https://www.nba.com/stats/team/1610612737
+  // This hangs (figure it out): https://stats.nba.com/stats/commonteamroster?LeagueID=00&Season=2023-24&TeamID=1610612737
+  console.log(nbaTeams);
   nbaTeamData = new Map();
   nflTeamData = new Map();
   mlbTeamData = new Map();
@@ -99,6 +104,39 @@ const loadNFLPositions = () => {
     });
 };
 
+const loadNBARosters = () => {
+  //https://www.nba.com/stats/team/1610612743
+  //const team = values[teamIndex]; // 3 digit code for NFL team
+  let teams = teamMaps[sports.indexOf("nba")];
+  console.log(nbaTeams);
+  console.log("Loading NBA Roster");
+
+  nbaTeams.rosters.forEach((t) => {
+    const teamRoster = t.resultSets[0];
+    const teamId = t.parameters.TeamID;
+    // let matchedTeam = [...teams.entries()]
+    //   .filter(({ 1: v }) => v === teamId)
+    //   .map(([k]) => k)[0];
+    const matchedTeam = teamId;
+    let teamData = teamMap.get(matchedTeam);
+    if (!teamData) {
+      teamData = new Map();
+    }
+    teamRoster.rowSet.forEach((p) => {
+      const player = loadPlayerData(teamRoster.headers, p);
+      const nameParts = player.get("PLAYER").split(" ");
+      const lastName = nameParts[nameParts.length - 1];
+
+      player.set("LAST_NAME", lastName);
+      setUpFilters("nba", player);
+      teamData.set(player.get("NUM"), player);
+      teamMap.set(matchedTeam, teamData);
+    });
+  });
+
+  console.log(teamMaps);
+};
+
 const loadNFLRosters = () => {
   console.log("Loading NFL Roster");
   fetch("../data/roster_2023.csv")
@@ -131,8 +169,6 @@ const loadNFLRosters = () => {
         teamData.set(playerNo, player);
         teamMap.set(team, teamData);
       }
-      console.log(teamMap);
-      console.log(nflFilters);
     })
     .catch(function (err) {
       // Error handling goes here (e.g. the network request failed, etc)
@@ -161,13 +197,43 @@ function displayMenu(sports) {
   listNode.innerHTML = "";
   listNode.appendChild(fragment);
 }
-
 const showRoster = (sport, teamName) => {
+  switch (sport) {
+    case "nfl":
+      showNFLRoster(sport, teamName);
+      break;
+    case "nba":
+      showNBARoster(sport, teamName);
+      break;
+  }
+};
+
+const showNBARoster = (sport, teamName) => {
+  const index = sports.indexOf(sport);
+  const sportsMap = teamMaps[index];
+  const roster = teamMap.get(sportsMap.get(teamName));
+  displayResults(sport, teamName, roster);
+  $(".panel-side").show();
+
+  // $().addEventListener("click", () => showRoster(sport, teamName));
+  $("#mappedEvent").on("change", function () {
+    // Get the newly selected value
+    let teamLocations = allTeamLocations.get(sport);
+
+    const selectedValue = $(this).val();
+    changeLayer("none");
+    currentMarkerGroup = L.layerGroup().addTo(map);
+  });
+
+  showHidePlayers($("#filter-types").val(), $(".sports-filter:visible").val());
+};
+
+const showNFLRoster = (sport, teamName) => {
   const index = sports.indexOf(sport);
   const sportsMap = teamMaps[index];
   const roster = teamMap.get(sportsMap.get(teamName));
 
-  displayResults(teamName, roster);
+  displayResults(sport, teamName, roster);
   $(".panel-side").show();
 
   // $().addEventListener("click", () => showRoster(sport, teamName));
@@ -228,29 +294,69 @@ const showRoster = (sport, teamName) => {
 
   showHidePlayers($("#filter-types").val(), $(".sports-filter:visible").val());
 };
-const buildPopupContent = (player) => {
-  const wikiPlayerName = player.get("full_name").replace(" ", "_");
+const buildPopupContent = (sport, player) => {
+  let wikiPlayerName = "";
+  let urlPlayerName = "";
+  let imgUrl = "";
+  let playerNo = "";
+  let fullName = "";
+  let position = "";
+  let status = "";
+  let height = "";
+  let weight = "";
+  let college = "";
+  if (sport === "nfl") {
+    fullName = player.get("full_name");
+    playerNo = player.get("jersey_number");
+    wikiPlayerName = fullName.replace(" ", "_");
+    urlPlayerName = "players/" + fullName.replace(" ", "-").toLowerCase();
+    position = player.get("position");
+    status = player.get("status");
+    height = player.get("height");
+    weight = player.get("weight");
+    college = player.get("college");
+    birthDate = player.get("birth_date");
+    imgUrl =
+      player.get("headshot_url")?.replace('"', "") +
+      "," +
+      player.get("ngs_position")?.replace('"', "");
+  } else if (sport === "nba") {
+    fullName = player.get("PLAYER");
 
-  const nflPlayerName = player.get("full_name").replace(" ", "-").toLowerCase();
+    playerNo = player.get("NUM");
+    wikiPlayerName = fullName.replace(" ", "_");
+    urlPlayerName =
+      "player/" +
+      player.get("PLAYER_ID") +
+      "/" +
+      fullName.replace(" ", "-").toLowerCase();
+    position = player.get("POSITION");
+    status = "ACT";
+    height = player.get("HEIGHT");
+    weight = player.get("WEIGHT");
+    college = player.get("SCHOOL");
+    birthDate = player.get("BIRTH_DATE");
 
-  const imgUrl =
-    player.get("headshot_url")?.replace('"', "") +
-    "," +
-    player.get("ngs_position")?.replace('"', "");
-
-  return `<h4>${player.get("jersey_number")} ${player.get("full_name")}</h4> \
+    imgUrl = `https://cdn.nba.com/headshots/nba/latest/1040x760/${player.get(
+      "PLAYER_ID"
+    )}.png`;
+  }
+  const content =
+    `<h4>${playerNo} ${fullName}</h4> \
   <table style="border:0px"><tr><td>
-  <li>Position: ${player.get("position")} \
-  <li>Status: ${player.get("status")} \
-  <li>Height: ${player.get("height")}  Weight: ${player.get("weight")} \
-  <li>Rookie Year: ${player.get("rookie_year")}  Drafted By: ${player.get(
-    "draft_number"
-  )}
-  <li>College: ${player.get("college")}
-  <li>Birth Date: ${player.get("birth_date")}
+  <li>Position: ${position} \
+  <li>Status: ${status} \
+  <li>Height: ${height}  Weight: ${weight} ` +
+    (sport === "nfl"
+      ? `<li>Rookie Year: ${player.get(
+          "rookie_year"
+        )}  Drafted By: ${player.get("draft_number")}`
+      : ``) +
+    `<li>College: ${college}
+  <li>Birth Date: ${birthDate}
   <br>
   <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/${wikiPlayerName}">Wikipedia</a>
-  &nbsp;&nbsp;&nbsp;<a target="_blank" rel="noopener noreferrer" href="https://www.nfl.com/players/${nflPlayerName}">NFL Stats</a>
+  &nbsp;&nbsp;&nbsp;<a target="_blank" rel="noopener noreferrer" href="https://www.${sport}.com/${urlPlayerName}">${sport.toUpperCase()} Stats</a>
     </td>
     <td>
     <img src = "${imgUrl}" width="200" height="180">
@@ -258,6 +364,7 @@ const buildPopupContent = (player) => {
     </tr>
     </table>
   `;
+  return content;
 };
 
 const setupHovers = (element) => {
@@ -295,7 +402,7 @@ const setupHovers = (element) => {
   });
 };
 
-function displayResults(teamName, results) {
+function displayResults(sport, teamName, results) {
   const entries = [...results]; // or const entries = Array.from(map);
   entries.sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
 
@@ -305,20 +412,27 @@ function displayResults(teamName, results) {
     teamName.charAt(0).toUpperCase() + teamName.substring(1) + " Roster";
   const fragment = document.createDocumentFragment();
   for (const [key, player] of sortedMap.entries()) {
+    let playerNo =
+      sport === "nfl" ? player.get("jersey_number") : player.get("NUM");
+    let fullName =
+      sport === "nfl" ? player.get("full_name") : player.get("PLAYER");
     let imgUrl =
-      player.get("headshot_url")?.replace('"', "") +
-      "," +
-      player.get("ngs_position")?.replace('"', "");
+      sport === "nfl"
+        ? player.get("headshot_url")?.replace('"', "") +
+          "," +
+          player.get("ngs_position")?.replace('"', "")
+        : `https://cdn.nba.com/headshots/nba/latest/260x190/${player.get(
+            "PLAYER_ID"
+          )}.png`;
 
     let img = `<img src = "${imgUrl}" width="50" height="50">`;
-    const name =
-      img + " " + player.get("jersey_number") + ": " + player.get("full_name");
+    const name = img + " " + playerNo + ": " + fullName;
     const li = document.createElement("li");
     li.classList.add("panel-result");
     li.classList.add("hover-trigger");
-    setFields(li, player);
+    setFields(sport, li, player);
     li.innerHTML = name;
-    li.popupContent = buildPopupContent(player);
+    li.popupContent = buildPopupContent(sport, player);
     setupHovers(li);
     fragment.appendChild(li);
   }
@@ -328,21 +442,37 @@ function displayResults(teamName, results) {
 }
 
 const setUpFilters = (sport, player) => {
-  nflFilterableFields.forEach((field) => {
-    let set = nflFilters.get(field);
+  if (sport === "nfl") {
+    nflFilterableFields.forEach((field) => {
+      let set = nflFilters.get(field);
 
-    if (!set) {
-      set = new Set();
-      nflFilters.set(field, set);
-    }
+      if (!set) {
+        set = new Set();
+        nflFilters.set(field, set);
+      }
 
-    let value = player.get(field);
-    if (value && value.trim() !== "") set.add(value);
-  });
+      let value = player.get(field);
+      if (value && value.trim() !== "") set.add(value);
+    });
+  } else if (sport === "nba") {
+    nbaFilterableFields.forEach((field) => {
+      let set = nbaFilters.get(field);
+
+      if (!set) {
+        set = new Set();
+        nbaFilters.set(field, set);
+      }
+
+      let value = player.get(field);
+      if (value && value.trim() !== "") set.add(value);
+    });
+  }
 };
 
-const setFields = (li, player) => {
-  nflFilterableFields.forEach((field) => {
+const setFields = (sport, li, player) => {
+  const sportFields =
+    sport === "nfl" ? nflFilterableFields : nbaFilterableFields;
+  sportFields.forEach((field) => {
     let value = player.get(field);
     li.setAttribute(field, value);
   });
@@ -377,22 +507,7 @@ const loadPlayerData = (headers, values) => {
   return playerMap;
 };
 
-const loadNBARosters = () => {
-  console.log("Loading NBA Roster");
-
-  fetch("../data/nbaRoster.json")
-    .then((response) => response.json())
-    .then((data) => {
-      // Access and use the JSON data here
-      console.log(data);
-    })
-    .catch((error) => {
-      // Handle errors
-      console.error(error);
-    });
-};
-
-const populateFilters = (sports) => {
+const populateFilters = (sport) => {
   const filters = document.getElementById("filter-types");
   const fragment = document.createDocumentFragment();
 
@@ -400,12 +515,13 @@ const populateFilters = (sports) => {
   li.value = "";
   li.innerHTML = "Select to Add a Filter";
   fragment.appendChild(li);
-  nflFilters.forEach((value, key) => {
+  const sportFilters = sport === "nfl" ? nflFilters : nbaFilters;
+  sportFilters.forEach((value, key) => {
     const li = document.createElement("option");
     li.value = key;
     li.innerHTML = key;
     fragment.appendChild(li);
-    addFilterableList(key);
+    addFilterableList(sport, key);
   });
 
   filters.innerHTML = "";
@@ -416,8 +532,9 @@ const filterBy = (val) => {
   console.log(val);
 };
 
-const addFilterableList = (key) => {
-  values = nflFilters.get(key);
+const addFilterableList = (sport, key) => {
+  sportsFilters = sport === "nfl" ? nflFilters : nbaFilters;
+  values = sportsFilters.get(key);
   const fragment = document.createDocumentFragment();
   const select = document.createElement("select");
   select.classList.add("sports-filter");
@@ -441,4 +558,21 @@ const addFilterableList = (key) => {
   const filters = document.getElementById("show-filters");
 
   filters.appendChild(fragment);
+};
+
+const loadNBARostersURL = async () => {
+  console.log("Loading NBA Rosters");
+  const url =
+    "https://stats.nba.com/stats/commonteamroster?LeagueID=00&Season=2023-24&TeamID=1610612747";
+  const options = {
+    method: "GET",
+  };
+
+  try {
+    const response = await fetch(url);
+    const result = await response.text();
+    console.log(result);
+  } catch (error) {
+    console.error(error);
+  }
 };
