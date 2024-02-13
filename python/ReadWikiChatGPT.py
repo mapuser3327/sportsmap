@@ -4,10 +4,10 @@ def get_birth_info_from_wikipedia(person_name):
     response = requests.get(api_url)
     data_map = {}
     if response.status_code == 200:
-        content = response.content
-        # page_id = next(iter(content['query']['pages']))
-        # page_content = content['query']['pages'][page_id]['revisions'][0]['*']
-        for info in content.split("\n|"):
+        content = response.json()
+        page_id = next(iter(content['query']['pages']))
+        page_content = content['query']['pages'][page_id]['revisions'][0]['*']
+        for info in page_content .split("\n|"):
             keys = info.split("=", 1)
             if len(keys) > 1:
                 data_map[keys[0].strip()] = keys[1].strip()
