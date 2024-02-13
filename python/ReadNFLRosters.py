@@ -1,8 +1,8 @@
 import requests
 import json
 # https://www.nfl.com/teams/arizona-cardinals/roster
-def get_nba_roster(file, team_id):
-    api_url = f"https://www.nba.com/stats/team/{team_id}"
+def get_nfl_roster(file, team_id):
+    api_url = f"https://www.nfl.com/teams/arizona-cardinals/roster"
     response = requests.get(api_url)
     data_map = {}
     if response.status_code == 200:
@@ -30,14 +30,14 @@ def print_data(name, sport_fields, data_map):
 
 
 if __name__ == "__main__":
-   file_path = "c://data/nbaRosters.js"
+   file_path = "c://data/nflRosters.js"
  # open file, create new file, and apend
  # loop through team ids
-   teams = [1610612743,1610612737]
+   teams = ["arizona-cardinals"]
  # call below, with file, pass team id
    with open(file_path, "a") as file:
        for team in teams:
-          data_map = get_nba_roster(file, team)
+          data_map = get_nfl_roster(file, team)
 
 # {"spurs" => 1610612759}
 # 3
