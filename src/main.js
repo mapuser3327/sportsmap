@@ -50,7 +50,8 @@ function changeLayer(sport) {
 }
 
 function init() {
-  initSportsData();
+  // initSportsData();
+  initSportsData2();
   loadNFLPositions();
   loadNFLRosters();
   loadNBARosters();
@@ -122,8 +123,14 @@ function init() {
   // define functions that right icon for a given feature
   const getIconUrl = (sport, index, name) => {
     let lname = name.toLowerCase();
-    teamid = teamMaps[index]?.get(lname);
-
+    const map = teamMaps[index];
+    let teamid = 1;
+    if (!map) console.log("no map for index = " + index);
+    else {
+      // console.log(map);
+      teamid = map.get(lname);
+      if (!teamid) console.log(lname);
+    }
     urls = [
       `https://static.www.nfl.com/t_q-best/league/api/clubs/logos/${teamid}`,
       `https://cdn.nba.com/logos/nba/${teamid}/primary/L/logo.svg`,
@@ -148,12 +155,10 @@ function init() {
           return feature.properties.sport === sport.toUpperCase();
         },
         pointToLayer: function (feature, latlng) {
-          const parts = feature.properties.team.toLowerCase().split(" ");
-          let teamName = parts[parts.length - 1];
+          const teamName = feature.properties.team
+            .toLowerCase()
+            .replace(/ /g, "-");
 
-          if (sport === "mls") {
-            teamName = feature.properties.team.toLowerCase().replace(/ /g, "-");
-          }
           const marker = L.marker(latlng, {
             icon: getIconUrl(sport, index, teamName),
           });

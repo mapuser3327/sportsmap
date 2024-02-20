@@ -1,0 +1,153 @@
+nfl,Cincinnati Bengals,CIN
+nfl,Cleveland Browns,CLE
+nfl,Pittsburgh Steelers,PIT
+nfl,Buffalo Bills,BUF
+nfl,Miami Dolphins,MIA
+nfl,New England Patriots,NE
+nfl,New York Jets,NYJ
+nfl,Houston Texans,HOU
+nfl,Indianapolis Colts,IND
+nfl,Jacksonville Jaguars,JAX
+nfl,Tennessee Titans,TEN
+nfl,Denver Broncos,DEN
+nfl,Kansas City Chiefs,KC
+nfl,Las Vegas Raiders,LV
+nfl,Los Angeles Chargers,LAC
+nfl,Chicago Bears,CHI
+nfl,Detroit Lions,DET
+nfl,Green Bay Packers,GB
+nfl,Minnesota Vikings,MIN
+nfl,Dallas Cowboys,DAL
+nfl,New York Giants,NYG
+nfl,Philadelphia Eagles,PHI
+nfl,Washington Commanders,WAS
+nfl,Atlanta Falcons,ATL
+nfl,Carolina Panthers,CAR
+nfl,New Orleans Saints,NO
+nfl,Tampa Bay Buccaneers,TB
+nfl,Arizona Cardinals,ARI
+nfl,Los Angeles Rams,LA
+nfl,San Francisco 49ers,SF
+nfl,Seattle Seahawks,SEA
+nfl,Baltimore Ravens,BAL
+mlb,Arizona Diamondbacks,109
+mlb,Atlanta Braves,144
+mlb,Baltimore Orioles,110
+mlb,Boston Red Sox,111
+mlb,Chicago Cubs,112
+mlb,Chicago White Sox,145
+mlb,Cincinnati Reds,113
+mlb,Cleveland Indians,114
+mlb,Colorado Rockies,115
+mlb,Detroit Tigers,116
+mlb,Houston Astros,117
+mlb,Kansas City Royals,118
+mlb,Los Angeles Angels,108
+mlb,Los Angeles Dodgers,119
+mlb,Miami Marlins,146
+mlb,Milwaukee Brewers,158
+mlb,Minnesota Twins,142
+mlb,New York Mets,121
+mlb,New York Yankees,147
+mlb,Oakland Athletics,133
+mlb,Philadelphia Phillies,143
+mlb,Pittsburgh Pirates,134
+mlb,San Diego Padres,135
+mlb,San Francisco Giants,137
+mlb,Seattle Mariners,136
+mlb,St. Louis Cardinals,138
+mlb,Tampa Bay Rays,139
+mlb,Texas Rangers,140
+mlb,Toronto Blue Jays,141
+mlb,Washington Nationals,120
+nba,Boston Celtics,1610612738
+nba,Brooklyn Nets,1610612751
+nba,New York Knicks,1610612752
+nba,Philadelphia 76ers,1610612755
+nba,Toronto Raptors,1610612761
+nba,Chicago Bulls,1610612741
+nba,Cleveland Cavaliers,1610612739
+nba,Detroit Pistons,1610612765
+nba,Indiana Pacers,1610612754
+nba,Milwaukee Bucks,1610612749
+nba,Atlanta Hawks,1610612737
+nba,Charlotte Hornets,1610612766
+nba,Miami Heat,1610612748
+nba,Orlando Magic,1610612753
+nba,Washington Wizards,1610612764
+nba,Denver Nuggets,1610612743
+nba,Minnesota Timberwolves,1610612750
+nba,Oklahoma City Thunder,1610612760
+nba,Portland Trail Blazers,1610612757
+nba,Utah Jazz,1610612762
+nba,Golden State Warriors,1610612744
+nba,LA Clippers,1610612746
+nba,Los Angeles Lakers,1610612747
+nba,Phoenix Suns,1610612756
+nba,Sacramento Kings,1610612758
+nba,Dallas Mavericks,1610612742
+nba,Houston Rockets,1610612745
+nba,Memphis Grizzlies,1610612763
+nba,New Orleans Pelicans,1610612740
+nba,San Antonio Spurs,1610612759
+nhl,Carolina Hurricanes,CAR
+nhl,Columbus Blue Jackets,CBJ
+nhl,New Jersey Devils,NJD
+nhl,New York Islanders,NYI
+nhl,New York Rangers,NYR
+nhl,Philadelphia Flyers,PHI
+nhl,Pittsburgh Penguins,PIT
+nhl,Washington Capitals,WSH
+nhl,Boston Bruins,BOS
+nhl,Buffalo Sabres,BUF
+nhl,Detroit Red Wings,DET
+nhl,Florida Panthers,FLA
+nhl,Montreal Canadiens,MTL
+nhl,Ottawa Senators,OTT
+nhl,Tampa Bay Lightning,TBL
+nhl,Toronto Maple Leafs,TOR
+nhl,Arizona Coyotes,ARI
+nhl,Chicago Blackhawks,CHI
+nhl,Colorado Avalanche,COL
+nhl,Dallas Stars,DAL
+nhl,Minnesota Wild,MIN
+nhl,Nashville Predators,NSH
+nhl,St. Louis Blues,STL
+nhl,Winnipeg Jets,WPG
+nhl,Anaheim Ducks,ANA
+nhl,Calgary Flames,CGY
+nhl,Edmonton Oilers,EDM
+nhl,Los Angeles Kings,LAK
+nhl,San Jose Sharks,SJS
+nhl,Seattle Kraken,SEA
+nhl,Vancouver Canucks,VAN
+nhl,Vegas Golden Knights,VGK
+mls,Atlanta United,/v1620997957/assets/logos/ATL-Logo-480px.png
+mls,Austin FC,/v1614970762/assets/logos/15296-austin-logo_dcqfgn.png
+mls,Charlotte FC,/v1634242594/assets/logos/CLT_Logo_480x480v2.png
+mls,Chicago Fire FC,/v1633358356/assets/logos/CHI_Logo_480x480-2021-v2.png
+mls,FC Cincinnati,/v1620997960/assets/logos/CIN-Logo-480px.png
+mls,Colorado Rapids,/v1614970746/assets/logos/436-colorado-logo_yifx69.png
+mls,Columbus Crew,/v1621373535/assets/logos/CLB-Logo-New-480.png
+mls,D.C. United,/v1614970749/assets/logos/1326-dc-united-logo_pwc97q.png
+mls,FC Dallas,/v1614970753/assets/logos/1903-fc-dallas-logo_zf5uiy.png
+mls,Houston Dynamo FC,/v1614970752/assets/logos/1897-houston-logo_mwdpxd.png
+mls,Sporting Kansas City,/v1614970745/assets/logos/421-sporting-kc-logo_pyhxo8.png
+mls,LA Galaxy,/v1620997961/assets/logos/LA-Logo-480px.png
+mls,Los Angeles Football Club,/v1620998598/assets/logos/LAFC-Logo-480px.png
+mls,Inter Miami CF,/v1614970761/assets/logos/14880-miami-logo_m0n453.png
+mls,Minnesota United,/v1614970757/assets/logos/6977-minnesota-logo_tzjlhe.png
+mls,CF Montr&#xE9;al,/v1668018026/assets/mtl/logos/Montreal-Primary-480x480.png
+mls,Nashville SC,/v1614970761/assets/logos/15154-nashville-logo_ldatso.png
+mls,New England Revolution,/v1639491780/assets/ner/logos/NE-Logo-New-480px-v2.png
+mls,New York Red Bulls,/v1614970744/assets/logos/399-ny-red-bulls-logo_o6xw9r.png
+mls,New York City FC,/v1614970758/assets/logos/9668-nycfc-logo_mluq9x.png
+mls,Orlando City,/v1614970757/assets/logos/6900-orlando-logo_tfcjmq.png
+mls,Philadelphia Union,/v1614970756/assets/logos/5513-philadelphia-logo_ea33hb.png
+mls,Portland Timbers,/v1626094359/assets/logos/POR-Logo-480px_xh4gvt.png
+mls,Real Salt Lake,/v1625175977/assets/logos/RSL-Logo-480px_j5pblf.png
+mls,San Jose Earthquakes,/v1620997962/assets/logos/SJ-Logo-480px.png
+mls,Seattle Sounders FC,/v1702319240/assets/sea/logos/SEA2023-Full_Color-480x480_fk6mpu.png
+mls,St. Louis CITY SC,/v1632227611/assets/logos/STL-Logo-800_fxwprk.png
+mls,Toronto FC,/v1614970755/assets/logos/2077-toronto-fc-logo_gx1gtb.png
+mls,Vancouver Whitecaps FC,/v1614970751/assets/logos/1708-vancouver-logo_znac8n.png

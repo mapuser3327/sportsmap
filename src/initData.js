@@ -1,4 +1,3 @@
-const teamMaps = [];
 const sportsLayerMap = new Map();
 const teamMap = new Map();
 const sports = ["nfl", "nba", "mlb", "nhl", "mls"];
@@ -16,61 +15,61 @@ const nbaFilterableFields = ["SEASON", "POSITION", "LAST_NAME", "SCHOOL"];
 const nflFilters = new Map();
 const nbaFilters = new Map();
 
-const initSportsData = () => {
-  // For NBA, data was built by making these calls: https://www.nba.com/stats/team/1610612737
-  // This hangs (figure it out): https://stats.nba.com/stats/commonteamroster?LeagueID=00&Season=2023-24&TeamID=1610612737
-  console.log(nbaTeams);
-  nbaTeamData = new Map();
-  nflTeamData = new Map();
-  mlbTeamData = new Map();
-  nhlTeamData = new Map();
-  mlsTeamData = new Map();
-  nflData.weeks[0].standings.forEach((data) => {
-    const parts = data.team.fullName.toLowerCase().split(" ");
-    const logoParts = data.team.currentLogo.split("/");
+// const initSportsData = () => {
+//   // For NBA, data was built by making these calls: https://www.nba.com/stats/team/1610612737
+//   // This hangs (figure it out): https://stats.nba.com/stats/commonteamroster?LeagueID=00&Season=2023-24&TeamID=1610612737
+//   const teamMaps2 = [];
+//   nbaTeamData = new Map();
+//   nflTeamData = new Map();
+//   mlbTeamData = new Map();
+//   nhlTeamData = new Map();
+//   mlsTeamData = new Map();
+//   nflData.weeks[0].standings.forEach((data) => {
+//     const parts = data.team.fullName.toLowerCase().split(" ");
+//     const logoParts = data.team.currentLogo.split("/");
 
-    nflTeamData.set(parts[parts.length - 1], logoParts[logoParts.length - 1]);
-  });
-  teamMaps.push(nflTeamData);
+//     nflTeamData.set(parts[parts.length - 1], logoParts[logoParts.length - 1]);
+//   });
+//   teamMaps2[0] = nflTeamData;
 
-  nbaData.scoreboard.games.forEach((data) => {
-    nbaTeamData.set(
-      data.awayTeam.teamName.toLowerCase().replace(/ /g, ""),
-      data.awayTeam.teamId
-    );
-    nbaTeamData.set(
-      data.homeTeam.teamName.toLowerCase().replace(/ /g, ""),
-      data.homeTeam.teamId
-    );
-  });
+//   nbaData.scoreboard.games.forEach((data) => {
+//     nbaTeamData.set(
+//       data.awayTeam.teamName.toLowerCase().replace(/ /g, ""),
+//       data.awayTeam.teamId
+//     );
+//     nbaTeamData.set(
+//       data.homeTeam.teamName.toLowerCase().replace(/ /g, ""),
+//       data.homeTeam.teamId
+//     );
+//   });
 
-  teamMaps[1] = nbaTeamData;
+//   teamMaps2[1] = nbaTeamData;
 
-  mlbData.records.forEach((data) => {
-    data.teamRecords.forEach((t) => {
-      const parts = t.team.name.toLowerCase().split(" ");
-      mlbTeamData.set(parts[parts.length - 1], t.team.id);
-    });
-  });
-  teamMaps[2] = mlbTeamData;
+//   mlbData.records.forEach((data) => {
+//     data.teamRecords.forEach((t) => {
+//       const parts = t.team.name.toLowerCase().split(" ");
+//       mlbTeamData.set(parts[parts.length - 1], t.team.id);
+//     });
+//   });
+//   teamMaps2[2] = mlbTeamData;
 
-  nhlData.standings.forEach((data) => {
-    nhlTeamData.set(
-      data.teamCommonName.default.toLowerCase().replace(/ /g, ""),
-      data.teamAbbrev.default
-    );
-  });
-  teamMaps[3] = nhlTeamData;
+//   nhlData.standings.forEach((data) => {
+//     nhlTeamData.set(
+//       data.teamCommonName.default.toLowerCase().replace(/ /g, ""),
+//       data.teamAbbrev.default
+//     );
+//   });
+//   teamMaps2[3] = nhlTeamData;
 
-  mlsData.forEach((data) => {
-    mlsTeamData.set(
-      data.club.slug,
-      data.club.logoColorUrl.split("{formatInstructions}")[1]
-    );
-  });
-  teamMaps[4] = mlsTeamData;
-  console.log(teamMaps);
-};
+//   mlsData.forEach((data) => {
+//     mlsTeamData.set(
+//       data.club.slug,
+//       data.club.logoColorUrl.split("{formatInstructions}")[1]
+//     );
+//   });
+//   teamMaps2[4] = mlsTeamData;
+//   console.log(teamMaps2);
+// };
 
 const teamLogos = [
   "https://static.www.nfl.com/image/upload/v1554321393/league/nvfr7ogywskqrfaiu38m.svg",
@@ -104,9 +103,79 @@ const loadNFLPositions = () => {
     });
 };
 
+const teamMaps = [];
+const initSportsData2 = () => {
+  console.log("Loading NFL Positions");
+
+  fetch("../data/teams.csv")
+    .then(function (response) {
+      return response.text();
+    })
+    .then(function (text) {
+      const lines = text.split("\n");
+      const nbaTeamData2 = new Map();
+      const nflTeamData2 = new Map();
+      const mlbTeamData2 = new Map();
+      const nhlTeamData2 = new Map();
+      const mlsTeamData2 = new Map();
+      for (var i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (line.trim() === "") continue;
+        const values = line.split(",");
+        switch (values[0]) {
+          case "nba":
+            nbaTeamData2.set(
+              values[1].toLowerCase().replace(/ /g, "-"),
+              values[2].trim()
+            );
+            break;
+          case "nfl":
+            nflTeamData2.set(
+              values[1].toLowerCase().replace(/ /g, "-"),
+              values[2].trim()
+            );
+            break;
+          case "nhl":
+            nhlTeamData2.set(
+              values[1].toLowerCase().replace(/ /g, "-"),
+              values[2].trim()
+            );
+
+            break;
+          case "mlb":
+            mlbTeamData2.set(
+              values[1].toLowerCase().replace(/ /g, "-"),
+              values[2].trim()
+            );
+
+            break;
+          default:
+            mlsTeamData2.set(
+              values[1].toLowerCase().replace(/ /g, "-"),
+              values[2].trim()
+            );
+
+            break;
+        }
+      }
+      teamMaps[0] = nflTeamData2;
+      teamMaps[1] = nbaTeamData2;
+      teamMaps[2] = mlbTeamData2;
+      teamMaps[3] = nhlTeamData2;
+      teamMaps[4] = mlsTeamData2;
+      console.log(teamMaps);
+    })
+    .catch(function (err) {
+      // Error handling goes here (e.g. the network request failed, etc)
+      console.log(err);
+    });
+};
+
 const loadNBARosters = () => {
   //https://www.nba.com/stats/team/1610612743
   //const team = values[teamIndex]; // 3 digit code for NFL team
+  // https://stats.nba.com/stats/commonteamroster?LeagueID=00&Season=2023-24&TeamID=1610612743
+  // "commonteamroster"
   let teams = teamMaps[sports.indexOf("nba")];
   console.log(nbaTeams);
   console.log("Loading NBA Roster");
@@ -117,7 +186,8 @@ const loadNBARosters = () => {
     // let matchedTeam = [...teams.entries()]
     //   .filter(({ 1: v }) => v === teamId)
     //   .map(([k]) => k)[0];
-    const matchedTeam = teamId;
+    const matchedTeam = "" + teamId;
+
     let teamData = teamMap.get(matchedTeam);
     if (!teamData) {
       teamData = new Map();
@@ -133,8 +203,6 @@ const loadNBARosters = () => {
       teamMap.set(matchedTeam, teamData);
     });
   });
-
-  console.log(teamMaps);
 };
 
 const loadNFLRosters = () => {
@@ -212,6 +280,7 @@ const showNBARoster = (sport, teamName) => {
   const index = sports.indexOf(sport);
   const sportsMap = teamMaps[index];
   const roster = teamMap.get(sportsMap.get(teamName));
+
   displayResults(sport, teamName, roster);
   $(".panel-side").show();
 
@@ -229,6 +298,7 @@ const showNBARoster = (sport, teamName) => {
 };
 
 const showNFLRoster = (sport, teamName) => {
+  console.log(teamName);
   const index = sports.indexOf(sport);
   const sportsMap = teamMaps[index];
   const roster = teamMap.get(sportsMap.get(teamName));
@@ -498,7 +568,7 @@ const loadPlayerData = (headers, values) => {
             : "Special Teams"
         );
       } else {
-        console.log("No data for " + values[i]);
+        // console.log("No data for " + values[i]);
       }
     }
     i++;
