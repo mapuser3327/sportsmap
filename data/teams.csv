@@ -30,64 +30,64 @@ nfl,Los Angeles Rams,LA,LAR
 nfl,San Francisco 49ers,SF
 nfl,Seattle Seahawks,SEA
 nfl,Baltimore Ravens,BAL
-mlb,Arizona Diamondbacks,109,ari
-mlb,Atlanta Braves,144,atl
-mlb,Baltimore Orioles,110,bal
-mlb,Boston Red Sox,111,bos
+mlb,Arizona Diamondbacks,109
+mlb,Atlanta Braves,144
+mlb,Baltimore Orioles,110
+mlb,Boston Red Sox,111
 mlb,Chicago Cubs,112,chc
 mlb,Chicago White Sox,145,chw
 mlb,Cincinnati Reds,113,cin
-mlb,Cleveland Indians,114,cle
-mlb,Colorado Rockies,115,col
-mlb,Detroit Tigers,116,det
-mlb,Houston Astros,117,hou
+mlb,Cleveland Indians,114
+mlb,Colorado Rockies,115
+mlb,Detroit Tigers,116
+mlb,Houston Astros,117
 mlb,Kansas City Royals,118,kc
 mlb,Los Angeles Angels,108,laa
 mlb,Los Angeles Dodgers,119,lad
-mlb,Miami Marlins,146,mia
-mlb,Milwaukee Brewers,158,mil
-mlb,Minnesota Twins,142,min
+mlb,Miami Marlins,146
+mlb,Milwaukee Brewers,158
+mlb,Minnesota Twins,142
 mlb,New York Mets,121,nym
 mlb,New York Yankees,147,nyy
-mlb,Oakland Athletics,133,oak
-mlb,Philadelphia Phillies,143,phi
-mlb,Pittsburgh Pirates,134,pit
+mlb,Oakland Athletics,133
+mlb,Philadelphia Phillies,143
+mlb,Pittsburgh Pirates,134
 mlb,San Diego Padres,135,sd
 mlb,San Francisco Giants,137,sf
-mlb,Seattle Mariners,136,sea
+mlb,Seattle Mariners,136
 mlb,St. Louis Cardinals,138,stl
 mlb,Tampa Bay Rays,139,tb
-mlb,Texas Rangers,140,tex
-mlb,Toronto Blue Jays,141,tor
+mlb,Texas Rangers,140
+mlb,Toronto Blue Jays,141
 mlb,Washington Nationals,120,wsh
-nba,Boston Celtics,1610612738,bos
+nba,Boston Celtics,1610612738
 nba,Brooklyn Nets,1610612751,bkn
 nba,New York Knicks,1610612752,ny
-nba,Philadelphia 76ers,1610612755,phi
-nba,Toronto Raptors,1610612761,tor
-nba,Chicago Bulls,1610612741,chi
-nba,Cleveland Cavaliers,1610612739,cle
-nba,Detroit Pistons,1610612765,det
-nba,Indiana Pacers,1610612754,ind
-nba,Milwaukee Bucks,1610612749,mil
-nba,Atlanta Hawks,1610612737,atl
-nba,Charlotte Hornets,1610612766,cha
-nba,Miami Heat,1610612748,mia
-nba,Orlando Magic,1610612753,orl
-nba,Washington Wizards,1610612764,was
-nba,Denver Nuggets,1610612743,den
-nba,Minnesota Timberwolves,1610612750,min
+nba,Philadelphia 76ers,1610612755
+nba,Toronto Raptors,1610612761
+nba,Chicago Bulls,1610612741
+nba,Cleveland Cavaliers,1610612739
+nba,Detroit Pistons,1610612765
+nba,Indiana Pacers,1610612754
+nba,Milwaukee Bucks,1610612749
+nba,Atlanta Hawks,1610612737
+nba,Charlotte Hornets,1610612766
+nba,Miami Heat,1610612748
+nba,Orlando Magic,1610612753
+nba,Washington Wizards,1610612764
+nba,Denver Nuggets,1610612743
+nba,Minnesota Timberwolves,1610612750
 nba,Oklahoma City Thunder,1610612760,okc
-nba,Portland Trail Blazers,1610612757,por
+nba,Portland Trail Blazers,1610612757
 nba,Utah Jazz,1610612762,utah
 nba,Golden State Warriors,1610612744,gs
 nba,LA Clippers,1610612746,lac
 nba,Los Angeles Lakers,1610612747,lal
 nba,Phoenix Suns,1610612756,phx
-nba,Sacramento Kings,1610612758,sac
-nba,Dallas Mavericks,1610612742,dal
-nba,Houston Rockets,1610612745,hou
-nba,Memphis Grizzlies,1610612763,mem
+nba,Sacramento Kings,1610612758
+nba,Dallas Mavericks,1610612742
+nba,Houston Rockets,1610612745
+nba,Memphis Grizzlies,1610612763
 nba,New Orleans Pelicans,1610612740,no
 nba,San Antonio Spurs,1610612759,sa
 nhl,Carolina Hurricanes,CAR
