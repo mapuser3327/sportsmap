@@ -62,9 +62,9 @@ def print_data(name, sport_fields, data_map):
 
 
 if __name__ == "__main__":
-    sports = ["nfl","mlb","nba","nhl","mls"]
-
-    file_path = r"C:\test\sportsmap\data\teams.csv"
+    #sports = ["nfl","mlb","nba","nhl","mls"]
+    sports = ["nfl"]
+    file_path = r"C:\test\sportsmap\data\teams2.csv"
     sports_data = {}
     for sport in sports:
         data_map = get_data_from_url(sport)

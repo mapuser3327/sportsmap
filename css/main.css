@@ -77,11 +77,30 @@ body,
 	background: url('search-icon.png') bottom/75% no-repeat #fff;
 
 }
+.centered {
+  text-align:center;
+}
+
+.btn {
+  right: 5px;
+  position:absolute;
+  background-color: darkgray;
+  border: none;
+  color: white;
+  padding: 3px 6px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+/* Darker background on mouse-over */
+.btn:hover {
+  background-color: rgb(134, 135, 140);
+}
 
 .popup {
     display: none;
     position: absolute;
-    width: 400px;
+    width: 320px;
    
     background-color: #f7f7f7;
     border: 1px solid #ccc;
@@ -89,7 +108,28 @@ body,
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
     z-index: 9;
 }
+.popup_demo {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
 
+.popup_demo td, #customers th {
+  border: 1px solid #ddd;
+  padding: 4px;
+}
+
+.popup_demo tr:nth-child(even){background-color: #f2f2f2;}
+
+.popup_demo tr:hover {background-color: #ddd;}
+
+.popup_demo th {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  text-align: left;
+  background-color: #04AA6D;
+  color: white;
+}
 .sports-filter {
   display: none;
    font-size:xx-small;

@@ -1,77 +1,45 @@
-const sportsLayerMap = new Map();
-const teamMap = new Map();
-const sports = ["nfl", "nba", "mlb", "nhl", "mls"];
-const allTeamLocations = new Map();
-const nflPositions = new Map();
-const nflFilterableFields = [
-  "season",
-  "subteam",
-  "position",
-  "status",
-  "last_name",
-  "college",
+import * as mapping from "./map.js";
+import * as utils from "./utils.js";
+var currentMarkerGroup;
+var searchControl;
+const rosterMaps = {};
+export const sports = ["nfl", "nba", "mlb", "nhl", "mls"];
+
+const allTeamsMap = new Map();
+export const nflPositions = new Map();
+//Team_Code,Team_Name,Player_Name,Player_No,Position,Age,Height,Weight,Years_Experience,College
+export const nflFilterableFields = [
+  "Position",
+  "Age",
+  "Years_Experience",
+  "Player_name",
+  "College",
 ];
-const nbaFilterableFields = ["SEASON", "POSITION", "LAST_NAME", "SCHOOL"];
-const nflFilters = new Map();
-const nbaFilters = new Map();
+export const nbaFilterableFields = [
+  "SEASON",
+  "POSITION",
+  "LAST_NAME",
+  "SCHOOL",
+];
 
-// const initSportsData = () => {
-//   // For NBA, data was built by making these calls: https://www.nba.com/stats/team/1610612737
-//   // This hangs (figure it out): https://stats.nba.com/stats/commonteamroster?LeagueID=00&Season=2023-24&TeamID=1610612737
-//   const teamMaps2 = [];
-//   nbaTeamData = new Map();
-//   nflTeamData = new Map();
-//   mlbTeamData = new Map();
-//   nhlTeamData = new Map();
-//   mlsTeamData = new Map();
-//   nflData.weeks[0].standings.forEach((data) => {
-//     const parts = data.team.fullName.toLowerCase().split(" ");
-//     const logoParts = data.team.currentLogo.split("/");
+export const nflFilters = new Map();
+export const nbaFilters = new Map();
 
-//     nflTeamData.set(parts[parts.length - 1], logoParts[logoParts.length - 1]);
-//   });
-//   teamMaps2[0] = nflTeamData;
+export const init = () => {
+  const maps = utils.loadTeams(sports);
+  console.log(maps);
+  sports.forEach((sport) => {
+    allTeamsMap.set(sport, maps.get(sport));
+  });
+  loadNFLPositions();
+  sports.forEach((sport) => {
+    loadRoster(sport);
+  });
 
-//   nbaData.scoreboard.games.forEach((data) => {
-//     nbaTeamData.set(
-//       data.awayTeam.teamName.toLowerCase().replace(/ /g, ""),
-//       data.awayTeam.teamId
-//     );
-//     nbaTeamData.set(
-//       data.homeTeam.teamName.toLowerCase().replace(/ /g, ""),
-//       data.homeTeam.teamId
-//     );
-//   });
+  displayMenu(sports);
+};
 
-//   teamMaps2[1] = nbaTeamData;
-
-//   mlbData.records.forEach((data) => {
-//     data.teamRecords.forEach((t) => {
-//       const parts = t.team.name.toLowerCase().split(" ");
-//       mlbTeamData.set(parts[parts.length - 1], t.team.id);
-//     });
-//   });
-//   teamMaps2[2] = mlbTeamData;
-
-//   nhlData.standings.forEach((data) => {
-//     nhlTeamData.set(
-//       data.teamCommonName.default.toLowerCase().replace(/ /g, ""),
-//       data.teamAbbrev.default
-//     );
-//   });
-//   teamMaps2[3] = nhlTeamData;
-
-//   mlsData.forEach((data) => {
-//     mlsTeamData.set(
-//       data.club.slug,
-//       data.club.logoColorUrl.split("{formatInstructions}")[1]
-//     );
-//   });
-//   teamMaps2[4] = mlsTeamData;
-//   console.log(teamMaps2);
-// };
-
-const teamLogos = [
+export const teamLogos = [
   "https://static.www.nfl.com/image/upload/v1554321393/league/nvfr7ogywskqrfaiu38m.svg",
   "https://cdn.nba.com/logos/leagues/logo-nba.svg",
   "https://www.mlbstatic.com/team-logos/league-on-dark/1.svg",
@@ -79,8 +47,32 @@ const teamLogos = [
   "https://images.mlssoccer.com/image/upload/v1665849438/assets/logos/MLS-Crest-FFF-480px_tmwlkh.png",
 ];
 
+// define functions that right icon for a given feature
+export const getIconUrl = (sport, index, name) => {
+  let lname = utils.formatVal(name);
+  //console.log(lname);
+  const map = allTeamsMap.get(sport);
+  //console.log(sport, allTeamsMap, map);
+  let teamid = 1;
+  if (!map) console.log("no map for index = " + index);
+  else {
+    //console.log(map);
+    let data = map.get(lname);
+    if (data != null) {
+      teamid = data.get("team_code");
+    } else console.log(lname);
+  }
+  let teamUrl = utils.getTeamUrl(index, teamid);
+  var icon = L.icon({
+    iconUrl: teamUrl,
+    iconSize: [35, 35],
+  });
+
+  return icon;
+};
+
 const loadNFLPositions = () => {
-  console.log("Loading NFL Positions");
+  //console.log("Loading NFL Positions");
 
   fetch("../data/NFLPositions.csv")
     .then(function (response) {
@@ -88,8 +80,6 @@ const loadNFLPositions = () => {
     })
     .then(function (text) {
       const lines = text.split("\n");
-
-      const headers = lines[0].split(",");
       for (var i = 1; i < lines.length; i++) {
         const line = lines[i];
         const values = line.split(",");
@@ -103,140 +93,50 @@ const loadNFLPositions = () => {
     });
 };
 
-const teamMaps = [];
-const initSportsData2 = () => {
-  console.log("Loading NFL Positions");
+const initSportsData = () => {
+  //
+};
 
-  fetch("../data/teams.csv")
+const loadRoster = (sport) => {
+  console.log(`Loading ${sport} Roster`);
+
+  fetch(`../data/${sport}rosters.csv`)
     .then(function (response) {
       return response.text();
     })
     .then(function (text) {
-      const lines = text.split("\n");
-      const nbaTeamData2 = new Map();
-      const nflTeamData2 = new Map();
-      const mlbTeamData2 = new Map();
-      const nhlTeamData2 = new Map();
-      const mlsTeamData2 = new Map();
-      for (var i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        if (line.trim() === "") continue;
-        const values = line.split(",");
-        switch (values[0]) {
-          case "nba":
-            nbaTeamData2.set(
-              values[1].toLowerCase().replace(/ /g, "-"),
-              values[2].trim()
-            );
-            break;
-          case "nfl":
-            nflTeamData2.set(
-              values[1].toLowerCase().replace(/ /g, "-"),
-              values[2].trim()
-            );
-            break;
-          case "nhl":
-            nhlTeamData2.set(
-              values[1].toLowerCase().replace(/ /g, "-"),
-              values[2].trim()
-            );
-
-            break;
-          case "mlb":
-            mlbTeamData2.set(
-              values[1].toLowerCase().replace(/ /g, "-"),
-              values[2].trim()
-            );
-
-            break;
-          default:
-            mlsTeamData2.set(
-              values[1].toLowerCase().replace(/ /g, "-"),
-              values[2].trim()
-            );
-
-            break;
-        }
-      }
-      teamMaps[0] = nflTeamData2;
-      teamMaps[1] = nbaTeamData2;
-      teamMaps[2] = mlbTeamData2;
-      teamMaps[3] = nhlTeamData2;
-      teamMaps[4] = mlsTeamData2;
-      console.log(teamMaps);
-    })
-    .catch(function (err) {
-      // Error handling goes here (e.g. the network request failed, etc)
-      console.log(err);
-    });
-};
-
-const loadNBARosters = () => {
-  //https://www.nba.com/stats/team/1610612743
-  //const team = values[teamIndex]; // 3 digit code for NFL team
-  // https://stats.nba.com/stats/commonteamroster?LeagueID=00&Season=2023-24&TeamID=1610612743
-  // "commonteamroster"
-  let teams = teamMaps[sports.indexOf("nba")];
-  console.log(nbaTeams);
-  console.log("Loading NBA Roster");
-
-  nbaTeams.rosters.forEach((t) => {
-    const teamRoster = t.resultSets[0];
-    const teamId = t.parameters.TeamID;
-    // let matchedTeam = [...teams.entries()]
-    //   .filter(({ 1: v }) => v === teamId)
-    //   .map(([k]) => k)[0];
-    const matchedTeam = "" + teamId;
-
-    let teamData = teamMap.get(matchedTeam);
-    if (!teamData) {
-      teamData = new Map();
-    }
-    teamRoster.rowSet.forEach((p) => {
-      const player = loadPlayerData(teamRoster.headers, p);
-      const nameParts = player.get("PLAYER").split(" ");
-      const lastName = nameParts[nameParts.length - 1];
-
-      player.set("LAST_NAME", lastName);
-      setUpFilters("nba", player);
-      teamData.set(player.get("NUM"), player);
-      teamMap.set(matchedTeam, teamData);
-    });
-  });
-};
-
-const loadNFLRosters = () => {
-  console.log("Loading NFL Roster");
-  fetch("../data/roster_2023.csv")
-    .then(function (response) {
-      return response.text();
-    })
-    .then(function (text) {
+      //Team_Code,Team_Name,Player_Name,Player_No,Position,Age,Height,Weight,College,Salary
       const lines = text.split("\n");
       const headers = lines[0].split(",");
-      let playerIndex = headers.indexOf("jersey_number");
-      let teamIndex = headers.indexOf("team");
-      let statusIndex = headers.indexOf("status");
 
+      let teamMap = new Map();
       for (var i = 1; i < lines.length; i++) {
         const line = lines[i];
-        const values = line.split(","); // Buggy, should ignore commas in ""
+        if (line.trim() != "") {
+          const values = line.split(","); // Buggy, should ignore commas in ""
+          const player = utils.getDataMap(headers, values);
+          if (player.get("Player_Name") != null) {
+            const teamKey = utils.formatVal(player.get("Team_Name")); // 3 digit code for NFL team'
+            let teamData = teamMap.get(teamKey);
+            if (!teamData) {
+              teamData = new Map();
+            }
 
-        const status = values[statusIndex];
-
-        const team = values[teamIndex]; // 3 digit code for NFL team
-        let teamData = teamMap.get(team);
-        if (!teamData) {
-          teamData = new Map();
+            const unique_id = utils.formatVal(
+              player.get("Player_Name"),
+              player.get("espn_id")
+            );
+            setUpFilters(sport, player);
+            teamData.set(unique_id, player);
+            teamMap.set(teamKey, teamData);
+          } else {
+            //console.log(sport, player);
+          }
         }
-        const playerNo = values[playerIndex];
-        const player = loadPlayerData(headers, values);
-
-        if (status === "RES") continue;
-        setUpFilters("nfl", player);
-        teamData.set(playerNo, player);
-        teamMap.set(team, teamData);
       }
+
+      rosterMaps[sport] = teamMap;
+      console.log(rosterMaps);
     })
     .catch(function (err) {
       // Error handling goes here (e.g. the network request failed, etc)
@@ -244,7 +144,7 @@ const loadNFLRosters = () => {
     });
 };
 
-function displayMenu(sports) {
+export const displayMenu = (sports) => {
   const listNode = document.getElementById("sportsmenu");
   const fragment = document.createDocumentFragment();
 
@@ -256,194 +156,141 @@ function displayMenu(sports) {
     a.id = "nav-link-" + sport;
     a.classList.add("nav-link");
     a.classList.add("active");
-    //a.classList.add("active");
-    a.href = `javascript:changeLayer("${sport}")`;
+
+    a.addEventListener("click", () => changeLayer(sport));
+
     a.innerHTML = `<img id="${sport}" width="40px" height="40px" src="${teamLogos[index]}">`;
     li.appendChild(a);
     fragment.appendChild(li);
   });
   listNode.innerHTML = "";
   listNode.appendChild(fragment);
-}
-const showRoster = (sport, teamName) => {
-  switch (sport) {
-    case "nfl":
-      showNFLRoster(sport, teamName);
-      break;
-    case "nba":
-      showNBARoster(sport, teamName);
-      break;
-  }
 };
 
-const showNBARoster = (sport, teamName) => {
-  const index = sports.indexOf(sport);
-  const sportsMap = teamMaps[index];
-  const roster = teamMap.get(sportsMap.get(teamName));
-
-  displayResults(sport, teamName, roster);
+export const showRoster = (sport, teamName) => {
+  //console.log(teamName);
+  let lname = utils.formatVal(teamName);
+  const sportsMap = allTeamsMap.get(sport);
+  const teamData = sportsMap.get(teamName);
+  //console.log(teamData, rosterMaps);
+  const teamMaps = rosterMaps[sport];
+  // console.log(teamMaps);
+  const roster = teamMaps.get(teamName);
+  // console.log(teamData, roster);
+  displayResults(sport, teamData, roster);
   $(".panel-side").show();
-
-  // $().addEventListener("click", () => showRoster(sport, teamName));
-  $("#mappedEvent").on("change", function () {
-    // Get the newly selected value
-    let teamLocations = allTeamLocations.get(sport);
-
-    const selectedValue = $(this).val();
-    changeLayer("none");
-    currentMarkerGroup = L.layerGroup().addTo(map);
-  });
-
-  showHidePlayers($("#filter-types").val(), $(".sports-filter:visible").val());
 };
 
-const showNFLRoster = (sport, teamName) => {
-  console.log(teamName);
-  const index = sports.indexOf(sport);
-  const sportsMap = teamMaps[index];
-  const roster = teamMap.get(sportsMap.get(teamName));
-
-  displayResults(sport, teamName, roster);
-  $(".panel-side").show();
-
-  // $().addEventListener("click", () => showRoster(sport, teamName));
-  $("#mappedEvent").on("change", function () {
-    // Get the newly selected value
-    let teamLocations = allTeamLocations.get(sport);
-
-    const selectedValue = $(this).val();
-    changeLayer("none");
-    currentMarkerGroup = L.layerGroup().addTo(map);
-
-    for (const [key, player] of roster.entries()) {
-      if (player.get("draft_number")) {
-        let latlng = teamLocations.get(player.get("draft_number"));
-        let imgUrl =
-          player.get("headshot_url")?.replace('"', "") +
-          "," +
-          player.get("ngs_position")?.replace('"', "");
-
-        if (latlng) {
-          let specialIcon = L.Icon.extend({
-            options: {
-              iconUrl: imgUrl,
-              iconSize: [40, 40],
-            },
-          });
-
-          const marker = L.marker(latlng, {
-            icon: new specialIcon(),
-          });
-
-          marker.addTo(currentMarkerGroup);
-
-          let rookieTeam = teamName;
-          sportsMap.forEach((key, value) => {
-            if (key === player.get("draft_number")) {
-              rookieTeam = value;
-            }
-          });
-
-          let text = `<h4> ${player.get("full_name")} </h4>\
-          <li>Drafted By: ${rookieTeam} \
-          
-          <li>Rookie Year: ${player.get("rookie_year")} \
-          <li>College: ${player.get("college")} \
-          <br>
-          <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/${player
-            .get("full_name")
-            .replace(" ", "_")}">Wikipedia</a>
-          `;
-          let label = `${player.get("full_name")} ${player.get("rookie_year")}`;
-          marker.bindPopup(text); // Add a popup with the name of the point
-          // marker.bindLabel(label, { noHide: true });
-        }
-      }
-    }
-  });
-
-  showHidePlayers($("#filter-types").val(), $(".sports-filter:visible").val());
-};
-const buildPopupContent = (sport, player) => {
+export const buildPopupContent = (sport, teamData, player) => {
   let wikiPlayerName = "";
   let urlPlayerName = "";
   let imgUrl = "";
   let playerNo = "";
   let fullName = "";
   let position = "";
-  let status = "";
+  let age = "";
   let height = "";
   let weight = "";
   let college = "";
-  if (sport === "nfl") {
-    fullName = player.get("full_name");
-    playerNo = player.get("jersey_number");
-    wikiPlayerName = fullName.replace(" ", "_");
-    urlPlayerName = "players/" + fullName.replace(" ", "-").toLowerCase();
-    position = player.get("position");
-    status = player.get("status");
-    height = player.get("height");
-    weight = player.get("weight");
-    college = player.get("college");
-    birthDate = player.get("birth_date");
-    imgUrl =
-      player.get("headshot_url")?.replace('"', "") +
-      "," +
-      player.get("ngs_position")?.replace('"', "");
-  } else if (sport === "nba") {
-    fullName = player.get("PLAYER");
+  let yearsExp = "";
+  let salary = "";
+  let teamName = "";
+  let rookieYear = "";
+  let draftData = "";
+  let espnUrl = "";
+  let teamId = teamData.get("team_code");
+  let hometown =
+    player.get("HomeTown") == null
+      ? ""
+      : player.get("HomeTown").replace("_", ",").replace("CAN", "Canada");
+  if (hometown != null) {
+    hometown = hometown.trim();
+    let splits = hometown.split(",");
+    if (splits.length > 1 && splits[1].trim().length == 2) {
+      hometown += ", United States";
+    }
+  }
 
-    playerNo = player.get("NUM");
-    wikiPlayerName = fullName.replace(" ", "_");
+  const index = sports.indexOf(sport);
+  let teamUrl = utils.getTeamUrl(index, teamId);
+  const teamLink = teamData.get("team_url");
+  const teamHref = `<a href="${teamLink}" target="_blank">
+    <img src="${teamUrl}" alt="${teamData.get(
+    "team_name"
+  )} width="50px" height="50px">
+    </a>`;
+  //Team_Code,Team_Name,Player_Name,Player_No,Position,Age,Height,Weight,Years_Experience,College
+  teamName = player.get("Team_Name");
+  fullName = player.get("Player_Name");
+  playerNo = player.get("Player_No");
+  wikiPlayerName = fullName.replace(" ", "_");
+  position = player.get("Position") == null ? "" : player.get("Position");
+  age = player.get("Age");
+  height = player.get("Height");
+  weight = player.get("Weight");
+  college = player.get("College");
+  espnUrl = player.get("espn_url");
+
+  imgUrl =
+    player
+      .get("espn_headshot")
+      .replace("/i/headshots/", "/combiner/i?img=/i/headshots/") +
+    "&h=230&w=280&scale=crop";
+  if (sport === "nfl") {
+    urlPlayerName = "players/" + fullName.replace(" ", "-").toLowerCase();
+
+    yearsExp = player.get("Years_Experience");
+  } else if (sport === "nba") {
+    //Team_Code,Team_Name,Player_Name,Player_No,Position,Age,Height,Weight,College,Salary
+
     urlPlayerName =
       "player/" +
-      player.get("PLAYER_ID") +
+      player.get("Player_No") +
       "/" +
       fullName.replace(" ", "-").toLowerCase();
-    position = player.get("POSITION");
-    status = "ACT";
-    height = player.get("HEIGHT");
-    weight = player.get("WEIGHT");
-    college = player.get("SCHOOL");
-    birthDate = player.get("BIRTH_DATE");
 
-    imgUrl = `https://cdn.nba.com/headshots/nba/latest/1040x760/${player.get(
-      "PLAYER_ID"
-    )}.png`;
+    salary = player.get("Salary").replaceAll("_", ",");
   }
+
   const content =
-    `<h4>${playerNo} ${fullName}</h4> \
-  <table style="border:0px"><tr><td>
-  <li>Position: ${position} \
-  <li>Status: ${status} \
-  <li>Height: ${height}  Weight: ${weight} ` +
-    (sport === "nfl"
-      ? `<li>Rookie Year: ${player.get(
-          "rookie_year"
-        )}  Drafted By: ${player.get("draft_number")}`
-      : ``) +
-    `<li>College: ${college}
-  <li>Birth Date: ${birthDate}
-  <br>
-  <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/${wikiPlayerName}">Wikipedia</a>
-  &nbsp;&nbsp;&nbsp;<a target="_blank" rel="noopener noreferrer" href="https://www.${sport}.com/${urlPlayerName}">${sport.toUpperCase()} Stats</a>
-    </td>
+    `<h2 class="centered">#${playerNo} - ${fullName}<h2>
+      <h4 class="centered">${teamHref}&nbsp;&nbsp; ${teamName} ${position} </h4>` +
+    (hometown == "" ? `` : `<h6 class="centered">From: ${hometown}</h6>`) +
+    `<hr>
+    <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/${wikiPlayerName}">Wikipedia</a>
+    &nbsp;&nbsp;&nbsp;<a target="_blank" rel="noopener noreferrer" href="https://www.${sport}.com/${urlPlayerName}">${sport.toUpperCase()} Stats</a>
+    &nbsp;&nbsp;&nbsp;<a target="_blank" rel="noopener noreferrer" href=${espnUrl}">ESPN Player Data</a>
+    </td><tr>
+  <table style="border:0px"><tr>
     <td>
-    <img src = "${imgUrl}" width="200" height="180">
+    <img src = "${imgUrl}">
     </td>
+    </tr> 
+    <tr><td><table class="popup_demo">   
+    <tr><th>Age</th><th>Height</th><th>Weight</th><th>Years Played</th><th>Salary</th></tr>
+    <td> ${age}</td><td> ${height}</td><td> ${weight}</td><td>${yearsExp}</td><td>${salary}</td>
     </tr>
-    </table>
+    </table></td></tr> 
+    <tr><td><table class="popup_demo">   
+    <tr><th>College</th><th>Rookie Year</th><th>Drafted By</th></tr>
+    <td>${college}</td><td> ${rookieYear}</td><td> ${draftData}</td><tr>
+    
+    </table></td></tr>
+   <tr><td>
+ 
+  </table>
   `;
   return content;
 };
 
-const setupHovers = (element) => {
+export const setupHovers = (element) => {
   element.addEventListener("click", function (e) {
+    $(".popup").hide();
     var trigger = $(this);
     $(".popup #popup_contents").html(element.popupContent);
     var popup = $(".popup");
     let triggerPosition = trigger.offset();
-    var popupHeight = $(".popup").outerHeight();
+    var popupHeight = $(".popup").outerHeight() + 100;
 
     var spaceAbove = triggerPosition.top;
     var spaceBelow =
@@ -463,7 +310,7 @@ const setupHovers = (element) => {
     } else {
       // If there is not enough space both above and below, position it at the top of the viewport
       popup.css({
-        top: 0,
+        top: triggerPosition.top - popupHeight / 2,
         left: triggerPosition.left - 200,
       });
     }
@@ -472,46 +319,50 @@ const setupHovers = (element) => {
   });
 };
 
-function displayResults(sport, teamName, results) {
-  const entries = [...results]; // or const entries = Array.from(map);
-  entries.sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
+export const displayResults = (sport, teamData, roster) => {
+  const entries = [...roster]; // or const entries = Array.from(map);
+  // entries.sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
+  // Team_Code,Team_Name,Player_Name,Player_No,Position,Age,Height,Weight,Years_Experience,College
 
   const sortedMap = new Map(entries);
+  const index = sports.indexOf(sport);
+  const teamURL = utils.getTeamUrl(index, teamData.get("team_code"));
+  const teamLink = teamData.get("team_url");
+  const teamHref = `<a href="${teamLink}" target="_blank">
+    <img src="${teamURL}" alt="${teamData.get(
+    "team_name"
+  )} width="50px" height="50px">
+    </a>`;
   const listNode = document.getElementById("list_players");
   document.getElementById("team_name").innerHTML =
-    teamName.charAt(0).toUpperCase() + teamName.substring(1) + " Roster";
+    teamHref + " &nbsp;&nbsp;" + teamData.get("team_name") + " Roster";
   const fragment = document.createDocumentFragment();
   for (const [key, player] of sortedMap.entries()) {
-    let playerNo =
-      sport === "nfl" ? player.get("jersey_number") : player.get("NUM");
-    let fullName =
-      sport === "nfl" ? player.get("full_name") : player.get("PLAYER");
+    let playerNo = player.get("Player_No");
+    let fullName = player.get("Player_Name");
     let imgUrl =
-      sport === "nfl"
-        ? player.get("headshot_url")?.replace('"', "") +
-          "," +
-          player.get("ngs_position")?.replace('"', "")
-        : `https://cdn.nba.com/headshots/nba/latest/260x190/${player.get(
-            "PLAYER_ID"
-          )}.png`;
+      player
+        .get("espn_headshot")
+        .replace("/i/headshots/", "/combiner/i?img=/i/headshots/") +
+      "&h=50&w=55&scale=crop";
 
-    let img = `<img src = "${imgUrl}" width="50" height="50">`;
+    let img = `<img src = "${imgUrl}">`;
     const name = img + " " + playerNo + ": " + fullName;
     const li = document.createElement("li");
     li.classList.add("panel-result");
     li.classList.add("hover-trigger");
     setFields(sport, li, player);
     li.innerHTML = name;
-    li.popupContent = buildPopupContent(sport, player);
+    li.popupContent = buildPopupContent(sport, teamData, player);
     setupHovers(li);
     fragment.appendChild(li);
   }
 
   listNode.innerHTML = "";
   listNode.appendChild(fragment);
-}
+};
 
-const setUpFilters = (sport, player) => {
+export const setUpFilters = (sport, player) => {
   if (sport === "nfl") {
     nflFilterableFields.forEach((field) => {
       let set = nflFilters.get(field);
@@ -539,7 +390,7 @@ const setUpFilters = (sport, player) => {
   }
 };
 
-const setFields = (sport, li, player) => {
+export const setFields = (sport, li, player) => {
   const sportFields =
     sport === "nfl" ? nflFilterableFields : nbaFilterableFields;
   sportFields.forEach((field) => {
@@ -548,7 +399,7 @@ const setFields = (sport, li, player) => {
   });
 };
 
-const loadPlayerData = (headers, values) => {
+export const loadPlayerData = (headers, values) => {
   const playerMap = new Map();
   let i = 0;
   headers.forEach((key) => {
@@ -577,7 +428,7 @@ const loadPlayerData = (headers, values) => {
   return playerMap;
 };
 
-const populateFilters = (sport) => {
+export const populateFilters = (sport) => {
   const filters = document.getElementById("filter-types");
   const fragment = document.createDocumentFragment();
 
@@ -598,13 +449,13 @@ const populateFilters = (sport) => {
   filters.appendChild(fragment);
 };
 
-const filterBy = (val) => {
+export const filterBy = (val) => {
   console.log(val);
 };
 
-const addFilterableList = (sport, key) => {
-  sportsFilters = sport === "nfl" ? nflFilters : nbaFilters;
-  values = sportsFilters.get(key);
+export const addFilterableList = (sport, key) => {
+  const sportsFilters = sport === "nfl" ? nflFilters : nbaFilters;
+  const values = sportsFilters.get(key);
   const fragment = document.createDocumentFragment();
   const select = document.createElement("select");
   select.classList.add("sports-filter");
@@ -630,19 +481,51 @@ const addFilterableList = (sport, key) => {
   filters.appendChild(fragment);
 };
 
-const loadNBARostersURL = async () => {
-  console.log("Loading NBA Rosters");
-  const url =
-    "https://stats.nba.com/stats/commonteamroster?LeagueID=00&Season=2023-24&TeamID=1610612747";
-  const options = {
-    method: "GET",
-  };
-
-  try {
-    const response = await fetch(url);
-    const result = await response.text();
-    console.log(result);
-  } catch (error) {
-    console.error(error);
+export const changeLayer = (sport) => {
+  $(".panel-side").hide();
+  $(".popup").hide();
+  populateFilters(sport);
+  $("#mappedEvent").val("");
+  if (currentMarkerGroup) {
+    currentMarkerGroup.clearLayers();
   }
+  $("a.nav-link.active").removeClass("active");
+  $(`#nav-link-${sport}`).addClass("active");
+  let index = -1;
+  mapping.sportsLayerMap.forEach((lyr, k) => {
+    index++;
+    if (k.toLowerCase().indexOf(sport) > -1) {
+      mapping.map.addLayer(lyr);
+      //console.log($("#panel-side"));
+      searchControl?.remove(mapping.map);
+      searchControl = L.control
+        .search({
+          layer: lyr,
+          container: $("#panel-side")[0],
+          initial: false,
+          propertyName: "team",
+          hideMarkerOnCollapse: true,
+          //zoom: 7,
+          marker: {
+            icon: null,
+            circle: {
+              radius: 20,
+              color: "#0a0",
+              opacity: 1,
+            },
+          },
+        })
+        .addTo(mapping.map);
+      $(".leaflet-control-search .search-button").css(
+        "background",
+        `url('${teamLogos[index]}') center/90% no-repeat ${
+          sport === "mls" ? "#000" : "#fff"
+        }`
+      );
+
+      console.log(
+        $(".leaflet-control-search .search-button").css("background")
+      );
+    } else mapping.map.removeLayer(lyr);
+  });
 };
