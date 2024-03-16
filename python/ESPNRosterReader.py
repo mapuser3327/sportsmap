@@ -36,12 +36,12 @@ def get_data_from_url(sport, team_short_name, team_long_name):
                 if index > 0:
 
                     ms = re.findall("([0-9]*)[.][a-z]{3,4}$",espn_headshot)
-                    espn_id=""
+                    espn_id="-"
                     if len(ms) > 0:
                         espn_id = ms[0]
 
                     lineStripped = re.sub(r"[,]{2,}", ',', line)
-                    lineStripped += espn_id+","+espn_headshot
+                    lineStripped +="{0},{1}".format(espn_id, espn_headshot)
                     lineStripped = lineStripped[1:]
                     lines.append(lineStripped)
                     #print(lineStripped)
@@ -67,7 +67,9 @@ def get_data_from_url(sport, team_short_name, team_long_name):
                     value = tempvalue+"`"+m2.group(1)  # Return the captured href value (group 1)
                     #print(value)
                else:
+                  #print(strippedvalue)
                   value = strippedvalue
+
 
                p3 = r'<div class="headshot.*?<img alt="(.*?)"'
                m3 = re.search(p3, orig)
@@ -85,7 +87,7 @@ def get_data_from_url(sport, team_short_name, team_long_name):
                valueStripped = '-'
 
            valueStripped= re.sub(r"&#x27;", '\'', valueStripped)
-           valueStripped = re.sub(r"&quot;", '\"', valueStripped)
+           valueStripped = re.sub(r"&quot;", '', valueStripped)
            valueStripped = re.sub(r"&amp;", '&', valueStripped)
            if index>0 :
                line+=valueStripped
@@ -101,13 +103,13 @@ def get_data_from_url(sport, team_short_name, team_long_name):
 if __name__ == "__main__":
 
     sports = ["nfl", "mlb", "nba", "nhl", "mls"]
-    sport = "nhl"
+    sport = "mlb"
     df = pd.read_csv(r"C:\test\sportsmap\data\teams.csv")
     #sorted_sport = df[df['sport'] == sport].head(1)
     sorted_sport = df[df['sport'] == sport]
     header_dict = {
         "nfl": "Team_Name,Player_Name,Player_No,espn_url,Position,Age,Height,Weight,Years_Experience,College,espn_id,espn_headshot",
-        "mlb": "Team_Name,Player_Name,Player_No,espn_url,Position,Bat,Throws,Age,Height,Weight,HomeTown_City,HomeTown_ST_COUNTRY,espn_id,espn_headshot",
+        "mlb": "Team_Name,Player_Name,Player_No,espn_url,Position,Bat,Throws,Age,Height,Weight,HomeTown,espn_id,espn_headshot",
         "nba": "Team_Name,Player_Name,Player_No,espn_url,Position,Age,Height,Weight,College,Salary,espn_id,espn_headshot",
         "nhl": "Team_Name,Player_Name,Player_No,espn_url,Age,Height,Weight,Shot,HomeTown,BirthDate,espn_id,espn_headshot",
         "mls": "Team_Name,Player_Name,Player_No,espn_url,Position,Age,Height,Weight,College,Salary,espn_id,espn_headshot"
